@@ -14,16 +14,48 @@ function collect(val, memo) {
   return memo;
 }
 program
+	.option('-d, --debug', 'log debug info')
 	.option('-p, --port', 'server port, default as 3000')
-	.option('-m, --middlewares', 'list of file names for middleware scripts', collect, [])
-	.option('-h, --history', 'whether to support http5 history api, as webpackDevServer "historyApiFallback"')
+	.option('-m, --middlewares [files]', 'list of file names for middleware scripts', collect, [])
+	.option('-5, --html5 [file]', 'whether to support html5 history api, as webpackDevServer "historyApiFallback"; default as "index.html", relative to where server starts;')
+	.option('-r, --root [dir]', 'virtual root directory, as webpack "publicPath", starts with "/", which will be removed when match file;')
+	.option('-M, --mock [dir]', 'api directory, rewrites to "mock";')
 	.parse(process.argv);
+//if <>|[], its bool;
+
+const log= program.debug? console.log.bind(console) :function(){};
+
+log('options:', program);
 
 const port = program.port || 3000;
 const middlewares=program.middlewares;
 
-if(history in program){
-	process.env.HISTORY_INDEX=program.history||'/index.html';
+let rootLen=0;
+if(program.root){
+	rootLen=program.root.length;
+	if(program.root.endsWith('/')){//user may not input trailing slash;
+		rootLen--;
+		program.root=program.root.substr(0, rootLen);
+	}
+}
+
+let mockLen=0;
+if(program.mock){
+	mockLen=program.mock.length;
+	if(program.mock.endsWith('/')){//user may not input trailing slash;
+		mockLen--;
+		program.mock=program.mock.substr(0, mockLen);
+	}
+}
+
+let historyIndex;
+if(program.html5){
+	historyIndex=program.html5!==true?program.html5:'/index.html';
+	log('none-exist directory resorts to: ', historyIndex);
+	if(!fs.existsSync('.'+historyIndex)){
+		console.error('this resorted html5 history file does not exist');
+		process.exit();
+	}
 }
 
 process.on('SIGINT', function(){
@@ -33,7 +65,7 @@ process.on('SIGINT', function(){
 
 http.createServer(function (req, res) {
 	console.log(`${req.method} ${req.url}`);
-	if(middlewares){
+	if(middlewares.length){
 		const cwd=process.cwd();
 		middlewares.forEach(function(el){
 			el=require(path.resolve(cwd, el));
@@ -42,25 +74,41 @@ http.createServer(function (req, res) {
 	}
 	// parse URL
 	const parsedUrl = url.parse(req.url);
+	let pathname;
 	// extract URL path
-	let pathname = `.${parsedUrl.pathname}`;
-	fs.exists(pathname, function (exist) {
+	if(rootLen && parsedUrl.pathname.startsWith(program.root)){
+		pathname=parsedUrl.pathname.substr(rootLen);
+	}else{
+		pathname = parsedUrl.pathname;
+	}
+	log('pathname', pathname);
+
+	fs.exists('.'+pathname, function (exist) {
 		if(!exist) {
-			if(process.env.HISTORY_INDEX&&fs.exists(process.env.HISTORY_INDEX)){
-				pathname=process.env.HISTORY_INDEX;
+			//api rewrite:
+			if(mockLen && pathname.startsWith(program.mock)){
+				pathname=`/mock${pathname.substr(mockLen)}.json`;
+			}else if(historyIndex){//resort only when directory;
+				log('resorting...');
+				pathname=historyIndex;
 			}else{
 				// if the file is not found, return 404
+				console.log('none:', pathname)
 				res.statusCode = 404;
 				res.end(`File ${pathname} not found!`);
-				return
+				return;
 			}
 		}
-		// if is a directory, then look for index.html
-		if (fs.statSync(pathname).isDirectory()) {
+		// if a directory, then look for index.html
+		if(fs.statSync('.'+pathname).isDirectory()){
+			if(!pathname.endsWith('/')){
+				pathname+='/';
+			}
 			pathname += '/index.html';
 		}
+		console.log('--serve with file:', pathname);
 		// read file from file system
-		fs.readFile(pathname, function(err, data){
+		fs.readFile('.'+pathname, function(err, data){
 			if(err){
 				res.statusCode = 500;
 				res.end(`Error getting the file: ${err}.`);
