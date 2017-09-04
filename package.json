@@ -1,6 +1,6 @@
 {
   "name": "flex-server",
-  "version": "1.0.0.0",
+  "version": "1.0.0",
   "description": "simplest static server with intercept-point for special case",
   "main": "index.js",
   "bin": {
