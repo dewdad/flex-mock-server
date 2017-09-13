@@ -15,7 +15,7 @@ function collect(val, memo) {
 }
 program
 	.option('-d, --debug', 'log debug info')
-	.option('-p, --port', 'server port, default as 3000')
+	.option('-p, --port [port]', 'server port, default as 3000', parseInt)
 	.option('-m, --middlewares [files]', 'list of file names for middleware scripts', collect, [])
 	.option('-5, --html5 [file]', 'whether to support html5 history api, as webpackDevServer "historyApiFallback"; default as "index.html", relative to where server starts;')
 	.option('-r, --root [dir]', 'virtual root directory, as webpack "publicPath", starts with "/", which will be removed when match file;')
