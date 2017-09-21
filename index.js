@@ -15,9 +15,10 @@ function collect(val, memo) {
 }
 program
 	.option('-d, --debug', 'log debug info')
-	.option('-p, --port [port]', 'server port, default as 3000', parseInt)
+	.option('-p, --port', 'server port, default as 3000')
 	.option('-m, --middlewares [files]', 'list of file names for middleware scripts', collect, [])
-	.option('-5, --html5 [file]', 'whether to support html5 history api, as webpackDevServer "historyApiFallback"; default as "index.html", relative to where server starts;')
+	.option('-i, --index [file]', 'default html page file name for **existing** folder')
+	.option('-5, --html5 [file]', 'whether to support html5 history api, as webpackDevServer "historyApiFallback", which is a path resorting to when directory non-exists; if "true" set to "index", or specify specifically, relative to where server starts;')
 	.option('-r, --root [dir]', 'virtual root directory, as webpack "publicPath", starts with "/", which will be removed when match file;')
 	.option('-M, --mock [dir]', 'api directory, rewrites to "mock";')
 	.parse(process.argv);
@@ -48,11 +49,14 @@ if(program.mock){
 	}
 }
 
-let historyIndex;
+let Index=program.index||'index.html';
+
+let HistoryIndex;
 if(program.html5){
-	historyIndex=program.html5!==true?program.html5:'/index.html';
-	log('none-exist directory resorts to: ', historyIndex);
-	if(!fs.existsSync('.'+historyIndex)){
+	HistoryIndex=program.html5=="true"?Index:program.html5;
+	HistoryIndex='/'+HistoryIndex;
+	log('none-exist directory resorts to: ', HistoryIndex);
+	if(!fs.existsSync('.'+HistoryIndex)){
 		console.error('this resorted html5 history file does not exist');
 		process.exit();
 	}
@@ -67,10 +71,11 @@ http.createServer(function (req, res) {
 	console.log(`${req.method} ${req.url}`);
 	if(middlewares.length){
 		const cwd=process.cwd();
-		middlewares.forEach(function(el){
+		const handled=middlewares.find(function(el){
 			el=require(path.resolve(cwd, el));
-			if(el&&el(req, res))return;
+			if(el&&el(req, res))return true;
 		})
+		if(handled)return;
 	}
 	// parse URL
 	const parsedUrl = url.parse(req.url);
@@ -88,9 +93,9 @@ http.createServer(function (req, res) {
 			//api rewrite:
 			if(mockLen && pathname.startsWith(program.mock)){
 				pathname=`/mock${pathname.substr(mockLen)}.json`;
-			}else if(historyIndex){//resort only when directory;
+			}else if(HistoryIndex){//resort only when directory;
 				log('resorting...');
-				pathname=historyIndex;
+				pathname=HistoryIndex;
 			}else{
 				// if the file is not found, return 404
 				console.log('none:', pathname)
@@ -99,12 +104,12 @@ http.createServer(function (req, res) {
 				return;
 			}
 		}
-		// if a directory, then look for index.html
+		// if a directory, then look for index file (directory exists, so not html5 resort scenario)
 		if(fs.statSync('.'+pathname).isDirectory()){
 			if(!pathname.endsWith('/')){
 				pathname+='/';
 			}
-			pathname += '/index.html';
+			pathname += Index;
 		}
 		console.log('--serve with file:', pathname);
 		// read file from file system
