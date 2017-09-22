@@ -16,6 +16,7 @@ function collect(val, memo) {
 program
 	.option('-d, --debug', 'log debug info')
 	.option('-p, --port', 'server port, default as 3000')
+	.option('-c, --cwd [dir]', 'current working directory, default to process.cwd()')
 	.option('-m, --middlewares [files]', 'list of file names for middleware scripts', collect, [])
 	.option('-i, --index [file]', 'default html page file name for **existing** folder')
 	.option('-5, --html5 [file]', 'whether to support html5 history api, as webpackDevServer "historyApiFallback", which is a path resorting to when directory non-exists; if "true" set to "index", or specify specifically, relative to where server starts;')
@@ -29,7 +30,22 @@ const log= program.debug? console.log.bind(console) :function(){};
 log('options:', program);
 
 const port = program.port || 3000;
-const middlewares=program.middlewares;
+
+
+const cwd = program.cwd || process.cwd();
+
+let middlewares=program.middlewares;
+if(middlewares.length){
+	middlewares=middlewares.reduce(function(rs, el){
+		const mod=require(path.resolve(cwd, el));
+		if(mod){
+			rs.push(mod);
+		}else{
+			console.warn('no middle found', el);
+		}
+		return rs;
+	}, [])
+}
 
 let rootLen=0;
 if(program.root){
@@ -70,10 +86,8 @@ process.on('SIGINT', function(){
 http.createServer(function (req, res) {
 	console.log(`${req.method} ${req.url}`);
 	if(middlewares.length){
-		const cwd=process.cwd();
 		const handled=middlewares.find(function(el){
-			el=require(path.resolve(cwd, el));
-			if(el&&el(req, res))return true;
+			return el(req, res);
 		})
 		if(handled)return;
 	}
