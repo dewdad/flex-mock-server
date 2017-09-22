@@ -9,17 +9,17 @@ const mime = require('mime');
 
 const program=require('commander');
 
-function collect(val, memo) {
-  memo.push(val);
-  return memo;
-}
+//function collect(val, memo) {
+//  memo.push(val);
+//  return memo;
+//}
 program
 	.option('-d, --debug', 'log debug info')
 	.option('-p, --port', 'server port, default as 3000')
 	.option('-c, --cwd [dir]', 'current working directory, default to process.cwd()')
-	.option('-m, --middlewares [files]', 'list of file names for middleware scripts', collect, [])
+	.option('-m, --middleware [file]', 'middleware file path; function(req, res); if handled, return true;')
 	.option('-i, --index [file]', 'default html page file name for **existing** folder')
-	.option('-5, --html5 [file]', 'whether to support html5 history api, as webpackDevServer "historyApiFallback", which is a path resorting to when directory non-exists; if "true" set to "index", or specify specifically, relative to where server starts;')
+	.option('-5, --html5 [file]', 'whether to support html5 history api, as webpackDevServer "historyApiFallback", which is a path resorting to when directory **non-exists**; if "true" set to "index", or specify specifically, relative to where server starts;')
 	.option('-r, --root [dir]', 'virtual root directory, as webpack "publicPath", starts with "/", which will be removed when match file;')
 	.option('-M, --mock [dir]', 'api directory, rewrites to "mock";')
 	.parse(process.argv);
@@ -34,18 +34,7 @@ const port = program.port || 3000;
 
 const cwd = program.cwd || process.cwd();
 
-let middlewares=program.middlewares;
-if(middlewares.length){
-	middlewares=middlewares.reduce(function(rs, el){
-		const mod=require(path.resolve(cwd, el));
-		if(mod){
-			rs.push(mod);
-		}else{
-			console.warn('no middle found', el);
-		}
-		return rs;
-	}, [])
-}
+const middleware=program.middleware?require(path.resolve(cwd, program.middleware)):null;
 
 let rootLen=0;
 if(program.root){
@@ -85,11 +74,9 @@ process.on('SIGINT', function(){
 
 http.createServer(function (req, res) {
 	console.log(`${req.method} ${req.url}`);
-	if(middlewares.length){
-		const handled=middlewares.find(function(el){
-			return el(req, res);
-		})
-		if(handled)return;
+	if(middleware&&middleware(req, res)){
+		console.log('middleware handled');
+		return;
 	}
 	// parse URL
 	const parsedUrl = url.parse(req.url);
