@@ -6,8 +6,6 @@ const fs = require('fs');
 const path = require('path');
 const mime = require('mime');
 
-const stdHandlers=require('./standard_handlers.js');
-
 const program=require('commander');
 
 const dataKey=Symbol('FS-DATA');
@@ -36,11 +34,12 @@ program.on('--help', function(){
 		{string}: path rewrites;
 		{function}: custom 'pre' handler (equal to {pre:function}), when response data (not undefined) is returned, indicating handled successfully, processing stops.
 		{{post:function}}: custom 'post' handler, modify response
-		{{Symbol('FS-DATA'):*}}: direct return data;
+		{{Symbol('FS-DATA'):*}}: direct return-data;
 	example:
 	module.exports={
 		'dir1/dir2/.*':401,
 		'dir1/dir2/':'dir1/abc/dir2',
+		'dir1/dir2/file.abc':{Symbol('FS-DATA'):JSON.stringify({custom:'data'})},
 		'dir1/dir2/':function(req, res){
 			if(res.params.id==1){
 				res.json({success:false});
