@@ -60,7 +60,6 @@ const cwd = program.cwd || process.cwd();
 
 const folder=program.folder?path.resolve(cwd, program.folder):cwd;
 
-log('program.map', program.map, path.resolve(cwd, program.map));
 const map=program.map?require(path.resolve(cwd, program.map)):null;
 
 let rootLen=0;
@@ -191,7 +190,7 @@ http.createServer(function (req, res) {
 				pathname=HistoryIndex;
 			}else{
 				// if the file is not found, return 404
-				console.log('Not found:', pathname)
+				console.log('\x1b[33m%s\x1b[0m','Not found:', pathname)
 				res.statusCode = 404;
 				end(`File ${pathname} not found!`);
 				return;
