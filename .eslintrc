@@ -1,0 +1,28 @@
+{
+  "env":{
+    "node":true,
+  }
+  ,"parser":"babel-eslint"
+    ,"parserOptions":{
+      "ecmaFeatures":{
+        "impliedStrict":true
+      }
+      ,"sourceType":"module"
+    }
+  ,"rules":{
+    "no-console":"off"
+  }
+  ,overrides: [
+  {
+    files: "*.test.js",
+    "env":{
+      "node":true,
+      "mocha":true,
+    },
+    rules: {
+      "no-unused-expressions": "off"
+    }
+  }
+  ]
+  ,"extends":["airbnb"]
+}
