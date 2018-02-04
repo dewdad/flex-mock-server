@@ -2,7 +2,7 @@ import { execFileSync, execFile } from 'child_process';
 import { expect } from 'chai';
 import { get } from 'http';
 
-describe('cli', function () {
+xdescribe('cli', function () {
   this.timeout(5000);
 
   it('correct help message', function () {
