@@ -2,7 +2,7 @@ import { execFileSync, execFile } from 'child_process';
 import { expect } from 'chai';
 import { get } from 'http';
 
-xdescribe('cli', function () {
+describe('cli', function () {
   this.timeout(5000);
 
   it('correct help message', function () {
@@ -15,14 +15,16 @@ xdescribe('cli', function () {
     child.stdout.on('data', (data) => {
       if (data.indexOf('Server listening on port') > -1) {
         get('http://localhost:3000/abcdef', (res) => {
-          child.kill();
+          child.kill('SIGKILL');
           expect(res.statusCode).to.be.equal(404);
-          done();
         });
       }
     });
     child.stderr.on('data', (error) => {
       done(error);
+    });
+    child.on('close', () => {
+      done();
     });
   });
 });

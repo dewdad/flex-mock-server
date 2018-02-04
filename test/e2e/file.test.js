@@ -44,7 +44,7 @@ describe('file system', function () {
     ensureWith(res, '/dir/index.html content\n');
   });
 
-  xit('non-existing directory, no historyFilePath set', async function () {
+  it('non-existing directory, no historyFilePath set', async function () {
     server.start();
 
     try {
