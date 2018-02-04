@@ -3,26 +3,36 @@
     "node":true,
   }
   ,"parser":"babel-eslint"
-    ,"parserOptions":{
-      "ecmaFeatures":{
-        "impliedStrict":true
-      }
-      ,"sourceType":"module"
+  ,"parserOptions":{
+    "ecmaFeatures":{
+      "impliedStrict":true
     }
+    ,"sourceType":"module"
+  }
   ,"rules":{
-    "no-console":"off"
+    "no-plusplus": 0,
+    "no-console": 0,
+    "import/first": 0,
+    "no-param-reassign": 0,
+    "global-require": 0,
   }
   ,overrides: [
   {
-    files: "*.test.js",
+    files: "test/**/*",
     "env":{
       "node":true,
       "mocha":true,
     },
     rules: {
-      "no-unused-expressions": "off"
+      "import/no-extraneous-dependencies": ["off", {
+        "devDependencies":"*"
+      }],
+      "func-names": "off",
+      "prefer-arrow-callback": "off",
+      "no-unused-expressions": "off",
+      "no-underscore-dangle": "off",
+      "no-global-assign": "off"
     }
-  }
-  ]
-  ,"extends":["airbnb"]
+  }]
+  ,"extends":["airbnb-base"]
 }

@@ -1,8 +1,8 @@
 {
-  "report-dir":"__coverage__",
   "require": [
     "babel-register"
   ],
+  "exclude":["src/lib/sample.map.js"],
   "sourceMap":false,
   "instrument":false
 }

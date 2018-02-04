@@ -1,3 +1,5 @@
 .nyc_output
-__coverage__
+coverage
+lib
+bin
 

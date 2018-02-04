@@ -1,8 +1,8 @@
 {
-	"presets": ["es2015"],
+	"presets": ["es2015", "stage-1"],
   "env":{
     "test":{
-      "plugins":["istanbul"]
+      "plugins":["istanbul", "rewire"]
     }
   }
 }
