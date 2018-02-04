@@ -14,14 +14,14 @@ const { port } = options;
 const server = http.createServer(createListener(options, logger));
 server.listen(port);
 
-function quit(){
-  console.log('quittttttttttt');
+function quit() {
+  console.log('quit');
   server.close();
   process.exit();
 }
 process.on('SIGINT', () => {
   logger.info('SIGINT received');
-  process.exit();
+  quit();
 });
 process.on('SIGUSER1', () => {
   quit();

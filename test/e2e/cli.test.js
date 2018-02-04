@@ -16,7 +16,7 @@ describe('cli', function () {
       console.log(data)
       if (data.indexOf('Server listening on port') > -1) {
         get('http://localhost:3000/abcdef', (res) => {
-          child.kill();
+          child.kill('SIGTERM');
           expect(res.statusCode).to.be.equal(404);
         });
       }
