@@ -20,6 +20,7 @@ process.on('SIGINT', () => {
 });
 process.on('exit', () => {
   logger.info('quit...');
+  console.error('quit...');
   server.close();
 });
 
