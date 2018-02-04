@@ -14,14 +14,35 @@ const { port } = options;
 const server = http.createServer(createListener(options, logger));
 server.listen(port);
 
+function quit(){
+  console.log('quittttttttttt');
+  server.close();
+  process.exit();
+}
 process.on('SIGINT', () => {
   logger.info('SIGINT received');
   process.exit();
 });
+process.on('SIGUSER1', () => {
+  quit();
+});
+process.on('SIGUSER2', () => {
+  quit();
+});
+process.on('SIGHUP', () => {
+  quit();
+});
+process.on('SIGTERM', () => {
+  quit();
+});
+process.on('beforeExit', () => {
+  quit();
+});
+process.on('uncaughtException', () => {
+  quit();
+});
 process.on('exit', () => {
-  logger.info('quit...');
-  console.error('quit...');
-  server.close();
+  quit();
 });
 
 logger.info(`Server listening on port ${port}`);
