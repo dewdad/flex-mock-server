@@ -23,7 +23,7 @@ describe('cli', function () {
     child.stderr.on('data', (error) => {
       done(error);
     });
-    child.on('close', () => {
+    child.on('exit', () => {
       done();
     });
   });
