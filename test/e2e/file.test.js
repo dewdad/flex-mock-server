@@ -44,7 +44,7 @@ describe('file system', function () {
     ensureWith(res, '/dir/index.html content\n');
   });
 
-  it('non-existing directory, no historyFilePath set', async function () {
+  xit('non-existing directory, no historyFilePath set', async function () {
     server.start();
 
     try {
@@ -53,6 +53,20 @@ describe('file system', function () {
       expect(err.response.statusCode).to.be.equal(404);
       expect(err.response.body).to.be.equal(STATUS_CODES[404]);
     }
+  });
+  it('non-existing directory, with historyFilePath set to true', async function () {
+    server = new Server({ history: true });
+    server.start();
+
+    const res = await got('http://localhost:3000/dir/abc/');
+    ensureWith(res, '/index.html content\n');
+  });
+  it('non-existing directory, with historyFilePath set to path', async function () {
+    server = new Server({ history: '/dir/home.htm' });
+    server.start();
+
+    const res = await got('http://localhost:3000/efd/abc/');
+    ensureHome(res);
   });
   it('existing file', async function () {
     server.start();
@@ -71,4 +85,3 @@ describe('file system', function () {
     }
   });
 });
-
