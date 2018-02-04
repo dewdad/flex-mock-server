@@ -15,7 +15,7 @@ describe('cli', function () {
     child.stdout.on('data', (data) => {
       console.log(data)
       if (data.indexOf('Server listening on port') > -1) {
-        const req = get('http://localhost:3000/abcdef', (res) => {
+        get('http://localhost:3000/abcdef', (res) => {
           child.kill();
           expect(res.statusCode).to.be.equal(404);
         });

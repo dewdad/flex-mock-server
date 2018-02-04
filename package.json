@@ -15,7 +15,7 @@
     "xtest": "npm run unit && npm run e2e",
     "test": "npm run e2e",
     "unit": "cross-env BABEL_ENV=test nyc --reporter=lcov --reporter=text mocha --require babel-polyfill test/unit",
-    "e2e": "cross-env BABEL_ENV=test mocha --require babel-core/register test/e2e/test-setup.js test/e2e/cli.test.js",
+    "e2e": "cross-env BABEL_ENV=test mocha --require babel-core/register test/e2e/test-setup.js test/e2e/cli.test.js test/e2e/options.test.js",
     "test-built": "cross-env BABEL_ENV=test mocha test/built.test.js",
     "lint": "eslint ./src",
     "build": "babel src -d ./ -s",
