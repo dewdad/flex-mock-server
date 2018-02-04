@@ -14,7 +14,6 @@ export default class FileReader {
   constructor(listener) {
     this.listener = listener;
     this.logger = listener.logger;
-
     this.historyFilePath = listener.options.history;
   }
 
