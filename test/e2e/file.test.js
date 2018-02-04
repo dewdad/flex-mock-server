@@ -37,19 +37,38 @@ describe('file system', function () {
   }
 
 
-  it('non-existing directory, with historyFilePath set to true', async function () {
-    server = new Server({ history: true });
+  it('existing directory, default index', async function () {
     server.start();
 
-    const res = await got('http://localhost:3000/dir/abc/');
-    ensureWith(res, '/index.html content\n');
+    const res = await got('http://localhost:3000/dir');
+    ensureWith(res, '/dir/index.html content\n');
   });
-  it('non-existing directory, with historyFilePath set to path', async function () {
-    server = new Server({ history: '/dir/home.htm' });
+
+  it('non-existing directory, no historyFilePath set', async function () {
     server.start();
 
-    const res = await got('http://localhost:3000/efd/abc/');
+    try {
+      await got('http://localhost:3000/code');
+    } catch (err) {
+      expect(err.response.statusCode).to.be.equal(404);
+      expect(err.response.body).to.be.equal(STATUS_CODES[404]);
+    }
+  });
+  it('existing file', async function () {
+    server.start();
+
+    const res = await got('http://localhost:3000/dir/home.htm');
     ensureHome(res);
+  });
+  it('non-existing file', async function () {
+    server.start();
+
+    try {
+      await got('http://localhost:3000/code/afe.htm');
+    } catch (err) {
+      expect(err.response.statusCode).to.be.equal(404);
+      expect(err.response.body).to.be.equal(STATUS_CODES[404]);
+    }
   });
 });
 
