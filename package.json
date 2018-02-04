@@ -6,6 +6,10 @@
     "flex-mock-server": "bin/flex-mock-server.js",
     "fms": "bin/flex-mock-server.js"
   },
+  "files":[
+    "/lib",
+    "/bin"
+  ],
   "main": "lib/server",
   "scripts": {
     "test": "npm run unit && npm run e2e",
