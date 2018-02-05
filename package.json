@@ -12,8 +12,7 @@
   ],
   "main": "lib/server",
   "scripts": {
-    "xtest": "npm run unit && npm run e2e",
-    "test": "npm run e2e",
+    "test": "npm run unit && npm run e2e",
     "unit": "cross-env BABEL_ENV=test nyc --reporter=lcov --reporter=text mocha --require babel-polyfill test/unit",
     "e2e": "cross-env BABEL_ENV=test mocha --require babel-core/register test/e2e/",
     "test-built": "cross-env BABEL_ENV=test mocha test/built.test.js",
