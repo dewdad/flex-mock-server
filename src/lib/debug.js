@@ -8,6 +8,8 @@ function formatArgs(...args) {
   return args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : arg)).join(' ');
 }
 
+const noop = () => {};
+
 class Logger {
   static ID = '[FMS';
   static Instances = 0;
@@ -19,7 +21,7 @@ class Logger {
     } else {
       this.id = `${this.constructor.ID}]`;
       global[globalId] = this;
-      this.debug('logger is stored in global in', globalId);
+      noop(globalId); // fix problem that rewire doens't export it.
     }
   }
   debug(...args) {
@@ -33,8 +35,6 @@ class Logger {
     console.log(chalk.red(this.id, formatArgs(...args)));
   }
 }
-
-const noop = () => {};
 
 export default function createLogger(toDebug) {
   const logger = new Logger();

@@ -4,8 +4,6 @@ import sinonChai from 'sinon-chai';
 
 before(function () {
   chai.use(sinonChai);
-
-  this.timeout(5000);
 });
 
 beforeEach('set sinon sandbox', function () {

@@ -11,11 +11,16 @@ const logger = createLogger(options.debug);
 normalize(options, logger);
 
 const { port } = options;
-http.createServer(createListener(options, logger)).listen(port);
+const server = http.createServer(createListener(options, logger));
+console.log(port);
+server.listen(port);
 
 process.on('SIGINT', () => {
-  logger.info('quit.');
   process.exit();
+});
+process.on('exit', () => {
+  server.close();
+  logger.info('quit.');
 });
 
 logger.info(`Server listening on port ${port}`);
