@@ -132,10 +132,10 @@ describe('options', () => {
     expect(res.headers['access-control-allow-methods']).to.be.equal(method);
   });
   it('root', async function () {
-    server = new Server({ root: 'rootdir' });
+    server = new Server({ root: 'rootdir', port:4000 });
     server.start();
 
-    const res = await got.post('http://localhost:3000/rootdir/dir/home.htm');
+    const res = await got.post('http://localhost:4000/rootdir/dir/home.htm');
     ensureHome(res);
   });
 });
