@@ -9,7 +9,7 @@ describe('cli.js', function () {
 
   it('correctly creates server', function () {
     const listen = this.sandbox.spy();
-    const createServer = this.sandbox.stub().returns({ listen });
+    const createServer = this.sandbox.stub().returns({ listen, close: () => {} });
     mockRequire('http', { createServer });
 
     const port = 123;

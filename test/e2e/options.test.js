@@ -28,7 +28,6 @@ describe('options', () => {
 
     server = new Server({ debug: true });
     server.start();
-    expect(console.log.secondCall.args[0].indexOf('Server listening on port 3000') > -1).to.be.ok;
 
     try {
       await got('http://localhost:3000/debug');

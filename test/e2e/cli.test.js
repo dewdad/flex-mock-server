@@ -22,7 +22,7 @@ describe('cli', function () {
     child.on('error', (error) => {
       done(error);
     });
-    child.on('close', () => {
+    child.on('exit', () => {
       done();
     });
   });
