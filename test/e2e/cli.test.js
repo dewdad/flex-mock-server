@@ -10,10 +10,10 @@ describe('cli', function () {
   });
 
   it('server runs successfully', function (done) {
-    const child = execFile('node', ['node_modules/babel-cli/bin/babel-node.js', 'src/bin/flex-mock-server.js', '--port', '3000']);
+    const child = execFile('node', ['node_modules/babel-cli/bin/babel-node.js', 'src/bin/flex-mock-server.js', '--port', '4000']);
     child.stdout.on('data', (data) => {
       if (data.indexOf('Server listening on port') > -1) {
-        get('http://localhost:3000/abcdef', (res) => {
+        get('http://localhost:4000/abcdef', (res) => {
           expect(res.statusCode).to.be.equal(404);
           child.kill();
         });
