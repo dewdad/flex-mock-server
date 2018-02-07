@@ -12,7 +12,7 @@ describe('cli', function () {
   it('server runs successfully', function (done) {
     let createChild = spawn;
     const opts = {};
-    if (process.platform === 'win') {
+    if (process.platform === 'win32') {
       createChild = execFile;
     } else {
       opts.detached = true;
@@ -22,7 +22,7 @@ describe('cli', function () {
       if (data.indexOf('Server listening on port') > -1) {
         get('http://localhost:3000/abcdef', (res) => {
           expect(res.statusCode).to.be.equal(404);
-          if (process.platform === 'win') {
+          if (process.platform === 'win32') {
             child.kill();
           } else {
             process.kill(-child.pid);

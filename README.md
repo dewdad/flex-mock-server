@@ -2,7 +2,7 @@
 
 [![NPM Version](http://img.shields.io/npm/v/flex-mock-server.svg?style=flat)](https://www.npmjs.org/package/flex-mock-server)
 [![Build Status](https://travis-ci.org/roneyrao/flex-mock-server.svg?branch=master)](https://travis-ci.org/roneyrao/flex-mock-server)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/ecc2e0f320028b66194e/test_coverage)](https://codeclimate.com/github/roneyrao/flex-mock-server/test_coverage)
+[![codecov](https://codecov.io/gh/roneyrao/flex-mock-server/branch/master/graph/badge.svg)](https://codecov.io/gh/roneyrao/flex-mock-server)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/roneyrao/flex-mock-server/master/LICENSE)
 
 A flexible mock server with easy configuring of response from file, inline data, function and more.
@@ -105,16 +105,16 @@ A flexible mock server with easy configuring of response from file, inline data,
   * {Number}: Treated as http code, being handled automatically; returns intermediately.
   * {Array}: An array, http code along with corresponding data: [301, 'http://abc.com']
   * {object}: a json of complex type, fields are:
-    - before {function(req, res, logger)}: 
+    - before {function(req, res, logger)}:
       Execute before processing, to modify request or whatever.
-    - after {function(req, res, responseData, logger)}: 
+    - after {function(req, res, responseData, logger)}:
       Called after response data is got and before sent.
     - data {\*}: (match for **any** type of METHOD)
-       - non-function  
+       - non-function
          Inline respone data for any method; This data is sent instead of from file.
-       - function(req, res, passedThroughData, logger)  
+       - function(req, res, passedThroughData, logger)
          Custom handler.  returns
-         1. the response data; 
+         1. the response data;
          2. a promise that resolves the response data (polyfill was already applied).
 
         **don't call respone.end()/write() yourself.**
