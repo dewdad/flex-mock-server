@@ -124,6 +124,7 @@ export function parseCli(options) {
     }
 
     - {string}: shorthand for string version of \`path\`: \`{path:''}\`
+    - {function}: shorthand for function version of \`data\`: { data: func }
 
     This map is walked through twice. The first time matched "before" handlers are executed. The second time to retrieve response data. However if the first time encounters a standard code handler, e.g. type of config is  Number/Array, traversing stops, returns immediately.
 

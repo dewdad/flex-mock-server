@@ -105,19 +105,29 @@ A flexible mock server with easy configuring of response from file, inline data,
   * {Number}: Treated as http code, being handled automatically; returns intermediately.
   * {Array}: An array, http code along with corresponding data: [301, 'http://abc.com']
   * {object}: a json of complex type, fields are:
-    - before {function(req, res, logger)}: Execute before processing, to modify request or whatever.
-    - after {function(req, res, responseData, logger)}: Called after response data is got and before sent.
-    - data {*}: (match for **any** type of METHOD)
-       - non-function: Inline respone data for any method; This data is sent instead of from file.
-       - function(req, res, passedThroughData, logger): Custom handler. returns 1) the response data; 2) a promise that resolves the response data (polyfill was already applied). **don't call respone.end()/write() yourself**
+    - before {function(req, res, logger)}: 
+      Execute before processing, to modify request or whatever.
+    - after {function(req, res, responseData, logger)}: 
+      Called after response data is got and before sent.
+    - data {\*}: (match for **any** type of METHOD)
+       - non-function  
+         Inline respone data for any method; This data is sent instead of from file.
+       - function(req, res, passedThroughData, logger)  
+         Custom handler.  returns
+         1. the response data; 
+         2. a promise that resolves the response data (polyfill was already applied).
+
+        **don't call respone.end()/write() yourself.**
+
     - path {string | function}: file path.
       - {string} - mapped file path string, internally it is called with String.replace(), so special replacement patterns are supported, such as `$&`, `$'`, `$1`.
       - {function(req, res, logger)} - custom replacer.
     - passThrough {bool}:  whether to check left items for more matches and pass this data on. default is false.
-    - get/post/... {*}: method respective version of 'data'.
+    - get/post/... {\*}: method respective version of 'data'.
   }
 
   * {string}: shorthand for string version of `path`: `{path:''}`
+  * {function}: shorthand for function version of `data`: { data: func }
 
   > This map is walked through twice. The first time matched "before" handlers are executed. The second time to retrieve response data. However if the first time encounters a standard code handler, e.g. type of config is  Number/Array, traversing stops, returns immediately.
 
