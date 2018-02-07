@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { get } from 'http';
 
 describe('cli', function () {
-  this.timeout(5000);
+  this.timeout(55000);
   it('correct help message', function () {
     const msg = execFileSync('node', ['node_modules/babel-cli/bin/babel-node.js', 'src/bin/flex-mock-server.js', '--help']);
     expect(msg.indexOf('module.exports = {') > -1).to.be.ok;
@@ -34,7 +34,15 @@ describe('cli', function () {
       done(error);
     });
     child.on('exit', (code) => {
-      done(code && new Error('Server error'));
+      if (code) {
+        done(new Error('Server error'));
+      } else {
+        const req = get('http://localhost:3000/abcdef');
+        req.on('error', function (err) {
+          console.log(err);
+          done();
+        });
+      }
     });
   });
 });
