@@ -2,7 +2,7 @@
 
 [![NPM Version](http://img.shields.io/npm/v/flex-mock-server.svg?style=flat)](https://www.npmjs.org/package/flex-mock-server)
 [![Build Status](https://travis-ci.org/roneyrao/flex-mock-server.svg?branch=master)](https://travis-ci.org/roneyrao/flex-mock-server)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/0d9047bd9fae6577010b/test_coverage)](https://codeclimate.com/github/roneyrao/flex-mock-server/test_coverage)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/ecc2e0f320028b66194e/test_coverage)](https://codeclimate.com/github/roneyrao/flex-mock-server/test_coverage)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/roneyrao/flex-mock-server/master/LICENSE)
 
 A flexible mock server with easy configuring of response from file, inline data, function and more.

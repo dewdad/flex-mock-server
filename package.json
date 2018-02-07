@@ -1,6 +1,6 @@
 {
   "name": "flex-mock-server",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "A flexible mock server with easy configuring of response from file, inline data, function and more.",
   "bin": {
     "flex-mock-server": "bin/flex-mock-server.js",
@@ -34,7 +34,7 @@
     "mock"
   ],
   "author": "Roney",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "babel-polyfill": "^6.26.0",
     "bluebird": "^3.5.1",
