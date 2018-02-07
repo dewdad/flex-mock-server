@@ -12,10 +12,14 @@ normalize(options, logger);
 
 const { port } = options;
 const server = http.createServer(createListener(options, logger));
-console.log(port);
 server.listen(port);
 
 process.on('SIGINT', () => {
+  logger.info('SIGINT');
+  process.exit();
+});
+process.on('SIGTERM', () => {
+  logger.info('SIGTERM');
   process.exit();
 });
 process.on('exit', () => {

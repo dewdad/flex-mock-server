@@ -48,6 +48,7 @@ A flexible mock server with easy configuring of response from file, inline data,
   // const Server = require('flex-mock-server').default;
   const params = {};
   const server = new Server(params);
+  server.onError((error) => console.error(error));
   server.start();
   ...
   server.stop();

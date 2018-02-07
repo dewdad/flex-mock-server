@@ -1,29 +1,40 @@
-import { execFileSync, execFile } from 'child_process';
+import { execFileSync, execFile, spawn } from 'child_process';
 import { expect } from 'chai';
 import { get } from 'http';
 
 describe('cli', function () {
-  this.timeout(8000);
+  this.timeout(5000);
   it('correct help message', function () {
     const msg = execFileSync('node', ['node_modules/babel-cli/bin/babel-node.js', 'src/bin/flex-mock-server.js', '--help']);
     expect(msg.indexOf('module.exports = {') > -1).to.be.ok;
   });
 
   it('server runs successfully', function (done) {
-    const child = execFile('node', ['node_modules/babel-cli/bin/babel-node.js', 'src/bin/flex-mock-server.js', '--port', '4000']);
+    let createChild = spawn;
+    const opts = {};
+    if (process.platform === 'win') {
+      createChild = execFile;
+    } else {
+      opts.detached = true;
+    }
+    const child = createChild('node', ['node_modules/babel-cli/bin/babel-node.js', 'src/bin/flex-mock-server.js'], opts);
     child.stdout.on('data', (data) => {
       if (data.indexOf('Server listening on port') > -1) {
-        get('http://localhost:4000/abcdef', (res) => {
+        get('http://localhost:3000/abcdef', (res) => {
           expect(res.statusCode).to.be.equal(404);
-          child.kill();
+          if (process.platform === 'win') {
+            child.kill();
+          } else {
+            process.kill(-child.pid);
+          }
         });
       }
     });
     child.on('error', (error) => {
       done(error);
     });
-    child.on('exit', () => {
-      done();
+    child.on('exit', (code) => {
+      done(code && new Error('Server error'));
     });
   });
 });
