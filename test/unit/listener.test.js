@@ -33,16 +33,15 @@ describe('class Listener', function () {
     beforeEach(function () {
       res.setHeader = this.sandbox.spy();
       this.listener = new Listener(options);
-      this.listener.context = context;
     });
 
     it('req.headers.origin is read and set', function () {
-      this.listener.setCorsHeaders();
+      this.listener.setCorsHeaders(context);
       sinon.assert.calledWithExactly(res.setHeader.firstCall, 'Access-Control-Allow-Origin', req.headers.origin);
     });
     it('set allow-credentials', function () {
       options.corsCookie = true;
-      this.listener.setCorsHeaders();
+      this.listener.setCorsHeaders(context);
       sinon.assert.calledWithExactly(res.setHeader.secondCall, 'Access-Control-Allow-Credentials', 'true');
     });
   });
@@ -54,27 +53,23 @@ describe('class Listener', function () {
     const res = { setHeader, end };
     const context = { req, res };
 
-    beforeEach(function () {
-      this.listener = new Listener();
-      this.listener.context = context;
-    });
     afterEach(function () {
       setHeader.reset();
     });
 
     it('end response', function () {
-      this.listener.handlePreflight();
+      Listener.handlePreflight(context);
       sinon.assert.calledOnce(end);
     });
     it('without request-headers and request-methods', function () {
-      this.listener.handlePreflight();
+      Listener.handlePreflight(context);
       sinon.assert.calledWithExactly(res.setHeader.firstCall, 'Access-Control-Allow-Headers', '*');
       sinon.assert.calledWithExactly(res.setHeader.secondCall, 'Access-Control-Allow-Methods', '*');
     });
     it('reflect request-headers and request-methods', function () {
       req.headers['access-control-request-headers'] = 'X-PINGOTHER, Content-Type';
       req.headers['access-control-request-method'] = 'post, get';
-      this.listener.handlePreflight();
+      Listener.handlePreflight(context);
       sinon.assert.calledWithExactly(res.setHeader.firstCall, 'Access-Control-Allow-Headers', req.headers['access-control-request-headers']);
       sinon.assert.calledWithExactly(res.setHeader.secondCall, 'Access-Control-Allow-Methods', req.headers['access-control-request-method']);
     });
@@ -82,19 +77,18 @@ describe('class Listener', function () {
 
   describe('send', function () {
     const req = {};
-    const res = {};
+    const res = { getHeader: () => 'text' };
     const context = { req, res };
 
     beforeEach(function () {
       res.end = this.sandbox.spy();
       this.listener = new Listener(null, this.logger);
-      this.listener.context = context;
     });
 
     it('no afterHandlers', function () {
       res.afterHandlers = [];
       const data = 'data';
-      this.listener.send(data);
+      this.listener.send(data, context);
       sinon.assert.calledWith(res.end, data);
     });
 
@@ -103,7 +97,7 @@ describe('class Listener', function () {
       const append = 'append';
       const handler = this.sandbox.stub().returns(data + append);
       res.afterHandlers = [handler];
-      this.listener.send(data);
+      this.listener.send(data, context);
       sinon.assert.calledWithExactly(handler, req, res, data, this.logger);
       sinon.assert.calledWithExactly(res.end, data + append);
     });
@@ -113,7 +107,7 @@ describe('class Listener', function () {
       const handler1 = this.sandbox.spy();
       const handler2 = this.sandbox.stub().returnsArg(2);
       res.afterHandlers = [handler1, handler2];
-      this.listener.send(data);
+      this.listener.send(data, context);
       sinon.assert.calledWithExactly(handler2, req, res, undefined, this.logger);
       sinon.assert.calledWithExactly(res.end, undefined);
     });
@@ -123,7 +117,7 @@ describe('class Listener', function () {
       const handler1 = this.sandbox.stub().returnsArg(2);
       const handler2 = this.sandbox.stub().returnsArg(2);
       res.afterHandlers = [handler1, handler2];
-      this.listener.send(data);
+      this.listener.send(data, context);
       sinon.assert.calledWithExactly(handler2, req, res, data, this.logger);
       sinon.assert.calledWithExactly(res.end, data);
     });
@@ -167,8 +161,8 @@ describe('class Listener', function () {
     });
     it('OPTIONS method, autoPreflight: true', function () {
       req.method = 'OPTIONS';
-      this.listener.handlePreflight = this.sandbox.spy();
-      const { handlePreflight } = this.listener;
+      Listener.handlePreflight = this.sandbox.spy();
+      const { handlePreflight } = Listener;
       options.autoPreflight = true;
       this.listener.listen(req, res);
       sinon.assert.calledOnce(handlePreflight);
@@ -176,8 +170,8 @@ describe('class Listener', function () {
     });
     it('OPTIONS method, autoPreflight: false', function () {
       req.method = 'OPTIONS';
-      this.listener.handlePreflight = this.sandbox.spy();
-      const { handlePreflight } = this.listener;
+      Listener.handlePreflight = this.sandbox.spy();
+      const { handlePreflight } = Listener;
       options.autoPreflight = false;
       this.listener.listen(req, res);
       sinon.assert.notCalled(handlePreflight);

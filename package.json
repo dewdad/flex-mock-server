@@ -1,6 +1,6 @@
 {
   "name": "flex-mock-server",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "A flexible mock server with easy configuring of response from file, inline data, function and more.",
   "bin": {
     "flex-mock-server": "bin/flex-mock-server.js",
@@ -14,13 +14,12 @@
   "scripts": {
     "test": "npm run unit && npm run e2e",
     "unit": "cross-env BABEL_ENV=test nyc --reporter=lcov --reporter=text mocha --require babel-polyfill test/unit",
-    "temp": "mocha test2.js",
     "e2e": "cross-env BABEL_ENV=test mocha --require babel-core/register test/e2e",
     "test-built": "cross-env BABEL_ENV=test mocha test/built.test.js",
     "lint": "eslint ./src",
-    "build": "babel src -d ./ -s",
+    "build": "babel src -d ./ -s && npm run test-built",
     "prebuild": "npm run lint && npm test",
-    "prepublishOnly": "npm run build && npm run test-built"
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",

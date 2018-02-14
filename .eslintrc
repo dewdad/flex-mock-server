@@ -15,6 +15,7 @@
     "import/first": 0,
     "no-param-reassign": 0,
     "global-require": 0,
+    "no-underscore-dangle": "off",
   }
   ,overrides: [
   {
@@ -24,13 +25,12 @@
       "mocha":true,
     },
     rules: {
-      "import/no-extraneous-dependencies": ["off", {
-        "devDependencies":"*"
+      "import/no-extraneous-dependencies": ["error", {
+        "devDependencies":true
       }],
       "func-names": "off",
       "prefer-arrow-callback": "off",
       "no-unused-expressions": "off",
-      "no-underscore-dangle": "off",
       "no-global-assign": "off"
     }
   }]

@@ -9,7 +9,7 @@ describe('cli.js', function () {
 
   it('correctly creates server', function () {
     const listen = this.sandbox.spy();
-    const createServer = this.sandbox.stub().returns({ listen, close: () => {} });
+    const createServer = this.sandbox.stub().returns({ listen, close: () => {}, on: () => {} });
     mockRequire('http', { createServer });
 
     const port = 123;
@@ -37,7 +37,7 @@ describe('cli.js', function () {
     sinon.assert.calledWithExactly(createLogger, debug);
     sinon.assert.calledWithExactly(createListener, options, this.logger);
     sinon.assert.calledWithExactly(createServer, listener);
-    sinon.assert.calledWithExactly(listen, port);
+    sinon.assert.calledWith(listen, port);
 
     const onArgs = on.firstCall.args;
     expect(onArgs[0]).to.be.equal('SIGINT');

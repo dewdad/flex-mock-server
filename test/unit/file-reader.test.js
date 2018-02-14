@@ -23,7 +23,7 @@ describe('class FileReader', function () {
     const res = {};
     const context = { req, res };
     beforeEach('create reader', function () {
-      this.reader = new FileReader({ context, logger: this.logger, options: {} });
+      this.reader = new FileReader({ logger: this.logger, options: {} });
     });
 
     it('succeed to read', function (done) {
@@ -33,7 +33,7 @@ describe('class FileReader', function () {
       const readFile = this.sandbox.stub().callsFake((file, encoding, cb) => cb(null, ctn));
       const readFileP = bPromise.promisify(readFile);
       __RewireAPI__.__set__('readFile', readFileP);
-      this.reader.doRead(filePath).then((content) => {
+      this.reader.doRead(filePath, context).then((content) => {
         sinon.assert.calledWith(readFile, filePath, 'utf8');
         expect(content).to.be.equal(ctn);
         sinon.assert.calledWith(res.setHeader, 'Content-type', 'text/html');
@@ -51,7 +51,7 @@ describe('class FileReader', function () {
         readFile: readFileP,
         stdHandler,
       });
-      this.reader.doRead('').then((content) => {
+      this.reader.doRead('', context).then((content) => {
         sinon.assert.calledWith(readFile, '', 'utf8');
         expect(content).to.be.equal(`Error getting the file: ${ioError.message}.`);
         sinon.assert.calledWithExactly(stdHandler, req, res, 500, null, this.logger);
@@ -96,7 +96,7 @@ describe('class FileReader', function () {
       req.url = 'abc/def';
       const folder = 'folderMock';
       this.reader.listener.options.folder = folder;
-      this.reader.handleFile();
+      this.reader.handleFile(context);
 
       sinon.assert.calledWithExactly(path.join, folder, req.url);
     });
@@ -111,7 +111,7 @@ describe('class FileReader', function () {
         stat: statP,
         access: accessP,
       });
-      this.reader.handleFile().then((ctn) => {
+      this.reader.handleFile(context).then((ctn) => {
         sinon.assert.calledWith(stat, req.url);
         sinon.assert.calledWith(access, path.join(req.url, index));
         sinon.assert.calledOnce(doRead);
@@ -130,7 +130,7 @@ describe('class FileReader', function () {
         stat: statP,
         stdHandler,
       });
-      this.reader.handleFile().then((ctn) => {
+      this.reader.handleFile(context).then((ctn) => {
         sinon.assert.notCalled(doRead);
         sinon.assert.calledWith(stdHandler, req, res, 404);
         expect(ctn).to.be.equal(undefined);
@@ -149,8 +149,8 @@ describe('class FileReader', function () {
         stat: statP,
         stdHandler,
       });
-      this.reader.handleFile().then((ctn) => {
-        sinon.assert.calledWithExactly(doRead, this.reader.historyFilePath);
+      this.reader.handleFile(context).then((ctn) => {
+        sinon.assert.calledWithExactly(doRead, this.reader.historyFilePath, context);
         sinon.assert.notCalled(stdHandler);
         expect(ctn).to.be.equal(fileCtn);
         done();
@@ -168,8 +168,8 @@ describe('class FileReader', function () {
         stat: statP,
         stdHandler,
       });
-      this.reader.handleFile().then((ctn) => {
-        sinon.assert.calledWithExactly(doRead, this.reader.historyFilePath);
+      this.reader.handleFile(context).then((ctn) => {
+        sinon.assert.calledWithExactly(doRead, this.reader.historyFilePath, context);
         sinon.assert.notCalled(stdHandler);
         expect(ctn).to.be.equal(fileCtn);
         done();
@@ -185,7 +185,7 @@ describe('class FileReader', function () {
       __RewireAPI__.__set__({
         stat: statP,
       });
-      this.reader.handleFile().then((ctn) => {
+      this.reader.handleFile(context).then((ctn) => {
         sinon.assert.calledOnce(doRead);
         expect(ctn).to.be.equal(fileCtn);
         done();
@@ -203,7 +203,7 @@ describe('class FileReader', function () {
         stat: statP,
         stdHandler,
       });
-      this.reader.handleFile().then((ctn) => {
+      this.reader.handleFile(context).then((ctn) => {
         sinon.assert.notCalled(doRead);
         sinon.assert.calledWith(stdHandler, req, res, 404);
         expect(ctn).to.be.equal(undefined);

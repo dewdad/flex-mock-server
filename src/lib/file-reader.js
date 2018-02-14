@@ -60,21 +60,21 @@ export default class FileReader {
           filePath = path.join(filePath, index);
           return access(filePath, fs.constants.R_OK)
             .then(
-              () => this.doRead(filePath),
+              () => this.doRead(filePath, context),
               (err) => {
                 this.logger.error(`Not found: ${filePath}, for ${err.message}`);
                 return stdHandler(req, res, 404, null, this.logger);
               },
             );
         }
-        return this.doRead(filePath);
+        return this.doRead(filePath, context);
       },
       (err) => {
         if (this.historyFilePath && filePath.indexOf('.') === -1) {
           // html5 resort scenario: non-exist directory;
           this.logger.debug(`${filePath} resorts to ${this.historyFilePath}`);
           filePath = this.historyFilePath;
-          return this.doRead(filePath);
+          return this.doRead(filePath, context);
         }
         // file non-exists.
         this.logger.error(`Not found: ${filePath}, for ${err.message}`);

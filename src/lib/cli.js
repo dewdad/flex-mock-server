@@ -1,4 +1,6 @@
-/// require('babel-polyfill');
+if (!global._babelPolyfill) {
+  require('babel-polyfill');
+}
 
 import http from 'http';
 import options from 'commander';
@@ -12,12 +14,12 @@ normalize(options, logger);
 
 const { port } = options;
 const server = http.createServer(createListener(options, logger));
-server.listen(port, () => {
-  logger.info(`Server listening on port ${server.address().port}`);
-});
 server.on('error', (err) => {
   logger.error('Server fails, status: ', server.listening, err.message);
   server.close();
+});
+server.listen(port, () => {
+  logger.info(`Server listening on port ${server.address().port}`);
 });
 
 process.on('SIGINT', () => {

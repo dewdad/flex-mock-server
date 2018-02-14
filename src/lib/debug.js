@@ -38,7 +38,7 @@ class Logger {
 
 export default function createLogger(toDebug) {
   const logger = new Logger();
-  // if (!toDebug) logger.debug = noop;
+  if (!toDebug) logger.debug = noop;
   return logger;
 }
 

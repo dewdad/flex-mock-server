@@ -62,7 +62,8 @@ class Listener {
     }
     res.end(body);
     this.logger.debug('sent data for', req.url);
-    if (res.getHeader('Content-type').startsWith('text')) {
+    const type = res.getHeader('Content-type');
+    if (type && type.startsWith('text')) {
       this.logger.debug('content:', body && body.length > 50 ? `${body.substr(0, 50)}'...'` : body);
     }
   }

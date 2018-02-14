@@ -15,7 +15,7 @@ export default class MapProcessor {
       type = 'array';
     }
     if (type === 'number' || type === 'array') {
-      this.processMapResponse(patnReg, setting, wrapper);
+      this.processMapResponse(patnReg, setting, wrapper, context);
     } else if (type === 'object') {
       if (setting.before) {
         this.logger.debug('found a "before" handler');

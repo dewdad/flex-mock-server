@@ -4,6 +4,7 @@ const execFile = childProcess.execFile;
 const spawn = childProcess.spawn;
 const expect = require('chai').expect;
 const get = require('http').get;
+const got = require('got');
 
 const Server = require('../lib/server').default;
 const map = require('../lib/sample.map');
@@ -50,8 +51,9 @@ describe('cli', function () {
 });
 
 describe('api', function () {
+  this.timeout(5000);
   it('{ data: 1 }', function (done) {
-    const server = new Server({ map ,debug:true });
+    const server = new Server({ map });
     server.start();
 
     get('http://localhost:3000/data/number', (res) => {
@@ -64,5 +66,29 @@ describe('api', function () {
         done();
       })
     });
+  });
+
+  it('multiple requests concurrently', async function () {
+    const server = new Server({ cwd: 'test/e2e/mock' });
+    server.start();
+
+    const req1 = got('http://localhost:3000/index.html')
+      .then((res) => {
+        expect(res.statusCode).to.be.equal(200);
+        expect(res.body).to.be.equal('/index.html content\n');
+      });
+    const req2 = got('http://localhost:3000/article_123_comment_456.json')
+      .then((res) => {
+        expect(res.statusCode).to.be.equal(200);
+        expect(res.body).to.be.equal('{"data": "article_mock_data"}\n');
+      });
+    const req3 = got('http://localhost:3000/dir/index.css')
+      .then((res) => {
+        expect(res.statusCode).to.be.equal(200);
+        expect(res.body).to.be.equal('body{}\n');
+      });
+
+    await Promise.all([req1, req2, req3]);
+    server.stop();
   });
 });

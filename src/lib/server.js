@@ -1,4 +1,6 @@
-require('babel-polyfill');
+if (!global._babelPolyfill) {
+  require('babel-polyfill');
+}
 
 import http from 'http';
 import createLogger from './debug';
