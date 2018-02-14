@@ -48,7 +48,7 @@ describe('cli', function () {
         });
         req.on('error', function (err) {
           console.log('server shutted down', err);
-          done(err);
+          done();
         });
       }
     });
