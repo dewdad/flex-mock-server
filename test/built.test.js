@@ -6,6 +6,17 @@ const expect = require('chai').expect;
 const get = require('http').get;
 const got = require('got');
 
+const fs = require('fs');
+const stat = fs.stat;
+let statBridge;
+fs.stat = function statWrapper(){
+  if (statBridge) {
+    statBridge.apply(null, arguments);
+  } else {
+    stat.apply(fs, arguments);
+  }
+}
+
 const Server = require('../lib/server').default;
 const map = require('../lib/sample.map');
 
@@ -42,7 +53,7 @@ describe('cli', function () {
       } else {
         const req = get('http://localhost:3000/abcdef');
         req.on('error', function (err) {
-          console.log(err);
+          console.log(err.message);
           done();
         });
       }
@@ -69,7 +80,16 @@ describe('api', function () {
   });
 
   it('multiple requests concurrently', async function () {
-    const server = new Server({ cwd: 'test/e2e/mock' });
+    statBridge = function(filepath, cb){
+      if (filepath === 'test/e2e/mock/article_123_comment_456.json application/json') {
+        setTimeout(function(){
+          stat.call(fs, filepath, cb);
+        }, 500);
+      } else {
+        stat.call(fs, filepath, cb);
+      }
+    };
+    const server = new Server({ debug:true, cwd: 'test/e2e/mock' });
     server.start();
 
     const req1 = got('http://localhost:3000/index.html')
