@@ -17,8 +17,8 @@ export default class FileReader {
     this.historyFilePath = listener.options.history;
   }
 
-  doRead(filePath) {
-    const { req, res } = this.listener.context;
+  doRead(filePath, context) {
+    const { req, res } = context;
     this.logger.debug('serve with file:', filePath);
     // read file from file system
     return readFile(filePath, 'utf8').then(
@@ -26,8 +26,14 @@ export default class FileReader {
         // based on the URL path, extract the file extention. e.g. .js, .doc, ...
         const { ext } = path.parse(filePath);
         // if the file is found, set Content-type and send data
-        res.setHeader('Content-type', mime.lookup(ext));
-        this.logger.debug('file content is', content.length > 50 ? content.substr(0, 50) : content);
+        const type = mime.lookup(ext);
+        this.logger.debug('set Content-type', filePath, type);
+        res.setHeader('Content-type', type);
+        if (type.startsWith('text')) {
+          this.logger.debug(filePath, 'content is\n', content.length > 50 ? content.substr(0, 50) : content);
+        } else {
+          this.logger.debug(filePath, 'type is', type);
+        }
         return content;
       },
       (err) => {
@@ -38,8 +44,7 @@ export default class FileReader {
     );
   }
 
-  handleFile() {
-    const { context } = this.listener;
+  handleFile(context) {
     const { req, res } = context;
     const { url } = req;
     let filePath = parseUrl(url).pathname;

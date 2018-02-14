@@ -15,11 +15,17 @@ export default class Server {
   }
   start() {
     this.server = http.createServer(this.listener);
-    if (this.onError) {
-      this.server.on('error', this.onError);
-    }
-    this.server.listen(this.options.port);
-    this.logger.info(`Server listening on port ${this.options.port}`);
+    this.server.on('error', (err) => {
+      if (this.onError) {
+        this.onError(err);
+      } else {
+        this.logger.error('Server fails', err.message);
+        this.stop();
+      }
+    });
+    this.server.listen(this.options.port, () => {
+      this.logger.info(`Server listening on port ${this.server.address().port}`);
+    });
   }
   stop() {
     if (this.server.listening) {

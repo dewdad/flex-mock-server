@@ -7,9 +7,9 @@ export default class MapProcessor {
     this.logger = listener.logger;
   }
 
-  runBeforeHandlers(patnReg, setting, wrapper) {
+  runBeforeHandlers(patnReg, setting, wrapper, context) {
     this.logger.debug('process pattern', patnReg.source, '-', setting);
-    const { req, res } = this.context;
+    const { req, res } = context;
     let type = typeof setting;
     if (type === 'object' && Array.isArray(setting)) {
       type = 'array';
@@ -26,12 +26,12 @@ export default class MapProcessor {
     return false;
   }
 
-  processMapResponse(patnReg, setting, wrapper) {
+  processMapResponse(patnReg, setting, wrapper, context) {
     this.logger.debug('process pattern', patnReg.source, '-', setting);
     if ('data' in wrapper) {
       this.logger.debug('passed in data is', wrapper.data);
     }
-    const { req, res } = this.context;
+    const { req, res } = context;
     let passThrough = false;
     let type = typeof setting;
     if (type === 'object' && Array.isArray(setting)) {
@@ -74,7 +74,7 @@ export default class MapProcessor {
         }
 
         // return this data directly;
-        let { method } = this.context.req;
+        let { method } = req;
         method = method.toLowerCase();
         const previousData = wrapper.data;
         if (method in setting) {
@@ -111,9 +111,8 @@ export default class MapProcessor {
    *
    * @returns {*} - response data
    */
-  handleMap() {
-    this.context = this.listener.context;
-    const { req } = this.context;
+  handleMap(context) {
+    const { req } = context;
 
     const wrapper = {};
 
@@ -124,7 +123,7 @@ export default class MapProcessor {
     const found = map.find(([patnReg, setting]) => {
       if (patnReg.test(req.url)) {
         this.logger.debug('matched pattern:', patnReg.source);
-        return !this.runBeforeHandlers(patnReg, setting, wrapper);
+        return !this.runBeforeHandlers(patnReg, setting, wrapper, context);
       }
       return false;
     });
@@ -133,7 +132,7 @@ export default class MapProcessor {
       map.find(([patnReg, setting]) => {
         if (patnReg.test(req.url)) {
           this.logger.debug('matched pattern:', patnReg.source);
-          return !this.processMapResponse(patnReg, setting, wrapper);
+          return !this.processMapResponse(patnReg, setting, wrapper, context);
         }
         return false;
       });

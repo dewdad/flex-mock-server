@@ -10,9 +10,6 @@ import FileReader from './file-reader';
 */
 
 class Listener {
-  // @member {Context}
-  context = null;
-
   constructor(options, logger) {
     this.options = options;
     this.logger = logger;
@@ -23,16 +20,16 @@ class Listener {
   /*
    * set cors headers
    */
-  setCorsHeaders() {
-    const { req, res } = this.context;
+  setCorsHeaders(context) {
+    const { req, res } = context;
     res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
     if (this.options.corsCookie) {
       res.setHeader('Access-Control-Allow-Credentials', 'true');
     }
   }
 
-  handlePreflight() {
-    const { req, res } = this.context;
+  static handlePreflight(context) {
+    const { req, res } = context;
     res.setHeader(
       'Access-Control-Allow-Headers',
       // headers are converted to lower case by http.
@@ -45,8 +42,8 @@ class Listener {
     res.end();
   }
 
-  send(data) {
-    const { req, res } = this.context;
+  send(data, context) {
+    const { req, res } = context;
     let body = data;
     if (res.afterHandlers.length) {
       res.afterHandlers.forEach((handler) => {
@@ -64,42 +61,44 @@ class Listener {
       }
     }
     res.end(body);
-    this.logger.debug('sent data:', body && body.length > 50 ? `${body.substr(0, 50)}'...'` : body);
+    this.logger.debug('sent data for', req.url);
+    if (res.getHeader('Content-type').startsWith('text')) {
+      this.logger.debug('content:', body && body.length > 50 ? `${body.substr(0, 50)}'...'` : body);
+    }
   }
 
   listen(req, res) {
     this.logger.info(req.method, req.url);
 
     const context = { req, res };
-    this.context = context;
 
     // container for handlers after response data is got and before sent;
     res.afterHandlers = [];
 
     if (this.options.cors && req.headers.origin) {
-      this.setCorsHeaders();
+      this.setCorsHeaders(context);
     }
 
     /*
      * OPTIONS request, handle automatically.
      */
     if (req.method === 'OPTIONS' && this.options.autoPreflight) {
-      this.handlePreflight();
+      Listener.handlePreflight(context);
       return;
     }
 
     req.url = parseUrl(req.url, this.options.root, this.logger);
 
     new Promise((resolve) => {
-      resolve(this.mapProcessor.handleMap());
+      resolve(this.mapProcessor.handleMap(context));
     }).then((wrapper) => {
       if (!('data' in wrapper)) {
         this.logger.debug('no custom handlers handled');
-        return this.fileReader.handleFile();
+        return this.fileReader.handleFile(context);
       }
       this.logger.debug('get data from custom handlers', wrapper.data);
       return wrapper.data;
-    }).then(data => this.send(data))
+    }).then(data => this.send(data, context))
       .catch((err) => {
         let msg;
         if (err instanceof Error) {
@@ -111,7 +110,7 @@ class Listener {
         this.logger.error('500:', err);
 
         res.statusCode = 500;
-        this.send(msg);
+        this.send(msg, context);
       });
   }
 }
