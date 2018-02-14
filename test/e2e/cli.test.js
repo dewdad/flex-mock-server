@@ -41,12 +41,14 @@ describe('cli', function () {
         const req = get('http://localhost:3000/abcdef', (res) => {
           console.log('failed to shutdown', res.statusCode);
         });
-        req.on('data', function (err) {
-          console.log('server shutted down', err);
+        req.on('data', function (data) {
+          const err = new Error(`server still running, ${data}`);
+          console.log(err.message);
+          done(err);
         });
         req.on('error', function (err) {
           console.log('server shutted down', err);
-          done();
+          done(err);
         });
       }
     });
