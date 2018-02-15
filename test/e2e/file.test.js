@@ -40,8 +40,8 @@ describe('file system', function () {
   it('existing directory, default index', async function () {
     server.start();
 
-    const res = await got('http://localhost:3000/dir');
-    ensureWith(res, '/dir/index.html content\n');
+    const res = await got('http://localhost:3000/');
+    ensureWith(res, '/index.html content\n');
   });
 
   it('non-existing directory, no historyFilePath set', async function () {

@@ -49,7 +49,11 @@ export default class FileReader {
     const { url } = req;
     let filePath = parseUrl(url).pathname;
     const { folder, index } = this.listener.options;
-    filePath = path.join(folder, filePath);
+    if (filePath) {
+      filePath = path.join(folder, filePath);
+    } else {
+      filePath = folder;
+    }
     this.logger.debug('read file from ', filePath);
     return stat(filePath).then(
       (stats) => {

@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/roneyrao/flex-mock-server/branch/master/graph/badge.svg)](https://codecov.io/gh/roneyrao/flex-mock-server)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/roneyrao/flex-mock-server/master/LICENSE)
 
-A flexible mock server with easy configuring of response from file, inline data, function and more.
+A static server, with easy extendability to become mock server, via flexible configuring of response from file, inline data, function and more.
 
 ## features
   * both CLI and API
