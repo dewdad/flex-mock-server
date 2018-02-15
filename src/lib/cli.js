@@ -26,10 +26,10 @@ process.on('SIGINT', () => {
   logger.info('SIGINT');
   process.exit();
 });
-process.on('SIGTERM', () => {
-  logger.info('SIGTERM');
-  process.exit();
-});
+// process.on('SIGTERM', () => {
+//   logger.info('SIGTERM');
+//   process.exit();
+// });
 process.on('exit', () => {
   server.close();
   logger.info('quit.');

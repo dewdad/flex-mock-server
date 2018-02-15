@@ -6,11 +6,13 @@ describe('class Server', function () {
   before('restore mockRequire', function () {
     this.listen = sinon.spy();
     this.close = sinon.spy();
-    this.httpServer = { listen: this.listen, close: this.close, on: sinon.spy() };
+    this.on = (evt, handler) => {
+      this.onErrorInner = handler;
+    };
+    this.httpServer = { listen: this.listen, close: this.close, on: this.on };
     this.createServer = sinon.stub().returns(this.httpServer);
     mockRequire('http', { createServer: this.createServer });
 
-    this.logger = { info: sinon.spy() };
     this.createLogger = sinon.stub().returns(this.logger);
     mockRequire('../../src/lib/debug', this.createLogger);
 
@@ -44,6 +46,15 @@ describe('class Server', function () {
     sinon.assert.calledWithExactly(this.createServer, this.listener);
     sinon.assert.calledWith(this.listen, this.port);
     expect(this.server.server).to.be.equal(this.httpServer);
+    const extErrorHandler = this.sandbox.spy();
+    this.server.onError(extErrorHandler);
+    this.sandbox.spy(this.server, 'stop');
+
+    const error = new Error('err');
+    this.onErrorInner(error);
+
+    sinon.assert.calledWithExactly(extErrorHandler, error);
+    sinon.assert.calledOnce(this.server.stop);
   });
   it('stop', function () {
     this.server.server.listening = true;
