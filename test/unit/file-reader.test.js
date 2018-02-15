@@ -30,7 +30,7 @@ describe('class FileReader', function () {
     it('succeed to read binary file', function () {
       const filePath = 'abc/def.png';
       res.setHeader = this.sandbox.spy();
-      this.sandbox.spy(fs, 'createReadStream');
+      this.sandbox.stub(fs, 'createReadStream');
       this.reader.doRead(filePath, context);
       sinon.assert.calledWith(fs.createReadStream, filePath);
       sinon.assert.calledWithExactly(res.setHeader, 'Content-type', 'image/png');
