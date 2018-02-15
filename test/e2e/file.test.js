@@ -17,7 +17,7 @@ describe('file system', function () {
 
   let server;
   beforeEach('create server', function () {
-    server = new Server();
+    server = new Server({debug:1});
   });
   afterEach('stop server', function () {
     server.stop();
@@ -40,7 +40,7 @@ describe('file system', function () {
   it('existing directory, default index', async function () {
     server.start();
 
-    const res = await got('http://localhost:3000/');
+    const res = await got('http://localhost:3000');
     ensureWith(res, '/index.html content\n');
   });
 
@@ -68,11 +68,21 @@ describe('file system', function () {
     const res = await got('http://localhost:3000/efd/abc/');
     ensureHome(res);
   });
-  it('existing file', async function () {
+  it('existing text file', async function () {
     server.start();
 
     const res = await got('http://localhost:3000/dir/home.htm');
     ensureHome(res);
+  });
+  it('existing binary file', async function () {
+    server.start();
+
+    const res = await got('http://localhost:3000/flight.svg');
+    res.on('close', () => {
+      expect(res.statusCode).to.be.equal(200);
+      expect(res.headers['content-type']).to.be.equal('image/svg+xml');
+      expect(res.body.length).to.be.equal(1380);
+    });
   });
   it('non-existing file', async function () {
     server.start();

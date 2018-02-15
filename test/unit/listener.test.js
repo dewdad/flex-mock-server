@@ -1,5 +1,6 @@
 import sinon from 'sinon';
 import { expect } from 'chai';
+import { ReadStream } from 'fs';
 
 import createListener, { __RewireAPI__ } from '../../src/lib/listener';
 
@@ -85,11 +86,47 @@ describe('class Listener', function () {
       this.listener = new Listener(null, this.logger);
     });
 
-    it('no afterHandlers', function () {
+    it('passed in string', function () {
       res.afterHandlers = [];
       const data = 'data';
       this.listener.send(data, context);
-      sinon.assert.calledWith(res.end, data);
+      sinon.assert.calledWithExactly(res.end, data);
+    });
+    it('passed in object', function () {
+      res.afterHandlers = [];
+      const data = { a: 1 };
+      this.listener.send(data, context);
+      sinon.assert.calledWithExactly(res.end, '{"a":1}');
+    });
+    it('passed in bool', function () {
+      res.afterHandlers = [];
+      const data = true;
+      this.listener.send(data, context);
+      sinon.assert.calledWithExactly(res.end, 'true');
+    });
+    it('passed in ReadStream', function () {
+      res.afterHandlers = [];
+      const evts = {};
+      function on(evt, handler) {
+        evts[evt] = handler;
+        return this;
+      }
+      const stdHandler = this.sandbox.spy();
+      __RewireAPI__.__set__({
+        stdHandler,
+      });
+      const data = new ReadStream('afa');
+      this.sandbox.stub(data, 'pipe').returns({ on });
+
+      this.listener.send(data, context);
+      sinon.assert.calledWithExactly(data.pipe, res);
+
+      evts.error({ message: 'err' });
+      sinon.assert.calledWithExactly(stdHandler, req, res, 500, null, this.logger);
+      sinon.assert.calledOnce(res.end);
+
+      evts.close();
+      sinon.assert.calledTwice(res.end);
     });
 
     it('single afterHandler', function () {

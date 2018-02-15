@@ -1,7 +1,9 @@
+import { ReadStream } from 'fs';
 import { getGlobalLogger } from './debug';
 import { parseUrl } from './path-parser';
 import MapProcessor from './map-processor';
 import FileReader from './file-reader';
+import stdHandler from './standard-code-handler';
 
 /**
  * @typedef {Object} Context
@@ -44,26 +46,36 @@ class Listener {
 
   send(data, context) {
     const { req, res } = context;
+    this.logger.debug('sent data for', req.url, res.getHeader('Content-type'));
     let body = data;
     if (res.afterHandlers.length) {
       res.afterHandlers.forEach((handler) => {
         body = handler(req, res, body, this.logger);
       });
     }
-    if (body != null) {
-      const type = typeof body;
-      if (type !== 'string') {
-        if (type === 'object') {
-          body = JSON.stringify(data);
-        } else {
-          body = body.toString();
+
+    if (body instanceof ReadStream) { // binary data
+      body.pipe(res)
+        .on('error', (err) => {
+          this.logger.debug(err.message);
+          stdHandler(req, res, 500, null, this.logger);
+          res.end();
+        })
+        .on('close', () => {
+          res.end();
+        });
+    } else { // text file
+      if (body != null) {
+        const type = typeof body;
+        if (type !== 'string') {
+          if (type === 'object') {
+            body = JSON.stringify(body);
+          } else {
+            body = body.toString();
+          }
         }
       }
-    }
-    res.end(body);
-    this.logger.debug('sent data for', req.url);
-    const type = res.getHeader('Content-type');
-    if (type && type.startsWith('text')) {
+      res.end(body);
       this.logger.debug('content:', body && body.length > 50 ? `${body.substr(0, 50)}'...'` : body);
     }
   }

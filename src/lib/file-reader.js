@@ -20,28 +20,31 @@ export default class FileReader {
   doRead(filePath, context) {
     const { req, res } = context;
     this.logger.debug('serve with file:', filePath);
+    // based on the URL path, extract the file extention. e.g. .js, .doc, ...
+    const { ext } = path.parse(filePath);
+    // if the file is found, set Content-type and send data
+    const type = mime.lookup(ext);
     // read file from file system
-    return readFile(filePath, 'utf8').then(
-      (content) => {
-        // based on the URL path, extract the file extention. e.g. .js, .doc, ...
-        const { ext } = path.parse(filePath);
-        // if the file is found, set Content-type and send data
-        const type = mime.lookup(ext);
-        this.logger.debug('set Content-type', filePath, type);
-        res.setHeader('Content-type', type);
-        if (type.startsWith('text')) {
-          this.logger.debug(filePath, 'content is\n', content.length > 50 ? content.substr(0, 50) : content);
-        } else {
-          this.logger.debug(filePath, 'type is', type);
-        }
-        return content;
-      },
-      (err) => {
-        stdHandler(req, res, 500, null, this.logger);
-        this.logger.error(`Failed to get file "${filePath}, for: " ${err.message}.`);
-        return `Error getting the file: ${err.message}.`;
-      },
-    );
+    this.logger.debug('set Content-type', filePath, type);
+    res.setHeader('Content-type', type);
+    if (type.startsWith('text')) {
+      return readFile(filePath, 'utf8').then(
+        (content) => {
+          if (type.startsWith('text')) {
+            this.logger.debug(filePath, 'content:\n', content.length > 50 ? content.substr(0, 50) : content);
+          } else {
+            this.logger.debug(filePath, 'type:', type);
+          }
+          return content;
+        },
+        (err) => {
+          stdHandler(req, res, 500, null, this.logger);
+          this.logger.error(`Failed to get file "${filePath}, for: " ${err.message}.`);
+          return `Error getting the file: ${err.message}.`;
+        },
+      );
+    }
+    return fs.createReadStream(filePath);
   }
 
   handleFile(context) {

@@ -97,18 +97,24 @@ describe('api', function () {
         expect(res.statusCode).to.be.equal(200);
         expect(res.body).to.be.equal('/index.html content\n');
       });
-    const req2 = got('http://localhost:3000/article_123_comment_456.json')
+    const req2 = got('http://localhost:3000/flight.svg')
+      .then((res) => {
+        expect(res.statusCode).to.be.equal(200);
+        expect(res.headers['content-type']).to.be.equal('image/svg');
+        expect(res.body.length).to.be.equal(1380);
+      });
+    const req3 = got('http://localhost:3000/article_123_comment_456.json')
       .then((res) => {
         expect(res.statusCode).to.be.equal(200);
         expect(res.body).to.be.equal('{"data": "article_mock_data"}\n');
       });
-    const req3 = got('http://localhost:3000/dir/index.css')
+    const req4 = got('http://localhost:3000/dir/index.css')
       .then((res) => {
         expect(res.statusCode).to.be.equal(200);
         expect(res.body).to.be.equal('body{}\n');
       });
 
-    await Promise.all([req1, req2, req3]);
+    await Promise.all([req1, req2, req3, req4]);
     server.stop();
   });
 });

@@ -1,3 +1,4 @@
+import fs from 'fs';
 import path from 'path';
 import sinon from 'sinon';
 import { expect } from 'chai';
@@ -26,7 +27,15 @@ describe('class FileReader', function () {
       this.reader = new FileReader({ logger: this.logger, options: {} });
     });
 
-    it('succeed to read', function (done) {
+    it('succeed to read binary file', function () {
+      const filePath = 'abc/def.png';
+      res.setHeader = this.sandbox.spy();
+      this.sandbox.spy(fs, 'createReadStream');
+      this.reader.doRead(filePath, context);
+      sinon.assert.calledWith(fs.createReadStream, filePath);
+      sinon.assert.calledWithExactly(res.setHeader, 'Content-type', 'image/png');
+    });
+    it('succeed to read text file', function (done) {
       const filePath = 'abc/def.htm';
       const ctn = 'file content';
       res.setHeader = this.sandbox.spy();
@@ -42,7 +51,7 @@ describe('class FileReader', function () {
         done(err);
       });
     });
-    it('fail to read', function (done) {
+    it('fail to read text file', function (done) {
       const ioError = new Error('Unknown fs error.');
       const readFile = this.sandbox.stub().callsFake((filePath, encoding, cb) => cb(ioError));
       const readFileP = bPromise.promisify(readFile);
@@ -51,8 +60,8 @@ describe('class FileReader', function () {
         readFile: readFileP,
         stdHandler,
       });
-      this.reader.doRead('', context).then((content) => {
-        sinon.assert.calledWith(readFile, '', 'utf8');
+      this.reader.doRead('abc.htm', context).then((content) => {
+        sinon.assert.calledWith(readFile, 'abc.htm', 'utf8');
         expect(content).to.be.equal(`Error getting the file: ${ioError.message}.`);
         sinon.assert.calledWithExactly(stdHandler, req, res, 500, null, this.logger);
         done();

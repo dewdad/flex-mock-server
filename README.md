@@ -108,7 +108,8 @@ A static server, with easy extendability to become mock server, via flexible con
     - before {function(req, res, logger)}:
       Execute before processing, to modify request or whatever.
     - after {function(req, res, responseData, logger)}:
-      Called after response data is got and before sent.
+      Called after response data is got and before sent.  
+      **if binary data, `fs.ReadStream` is passed instead of file content.**
     - data {\*}: (match for **any** type of METHOD)
        - non-function
          Inline respone data for any method; This data is sent instead of from file.
