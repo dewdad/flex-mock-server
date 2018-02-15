@@ -1,3 +1,4 @@
+import path from 'path';
 import sinon from 'sinon';
 import { expect } from 'chai';
 import { ReadStream } from 'fs';
@@ -115,7 +116,7 @@ describe('class Listener', function () {
       __RewireAPI__.__set__({
         stdHandler,
       });
-      const data = new ReadStream('afa');
+      const data = new ReadStream(path.resolve(__dirname, 'listener.test.js'));
       this.sandbox.stub(data, 'pipe').returns({ on });
 
       this.listener.send(data, context);

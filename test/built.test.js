@@ -100,7 +100,7 @@ describe('api', function () {
     const req2 = got('http://localhost:3000/flight.svg')
       .then((res) => {
         expect(res.statusCode).to.be.equal(200);
-        expect(res.headers['content-type']).to.be.equal('image/svg');
+        expect(res.headers['content-type']).to.be.equal('image/svg+xml');
         expect(res.body.length).to.be.equal(1380);
       });
     const req3 = got('http://localhost:3000/article_123_comment_456.json')
