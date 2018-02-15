@@ -97,12 +97,24 @@ describe('api', function () {
         expect(res.statusCode).to.be.equal(200);
         expect(res.body).to.be.equal('/index.html content\n');
       });
-    const req2 = got('http://localhost:3000/flight.svg')
-      .then((res) => {
-        expect(res.statusCode).to.be.equal(200);
-        expect(res.headers['content-type']).to.be.equal('image/svg+xml');
-        expect(res.body.length).to.be.equal(1380);
-      });
+    const req2 = new Promise((resolve, reject) => {
+      let len = 0;
+      got.stream('http://localhost:3000/loading.gif')
+        .on('response', (res) => {
+          res.on('data', (d) => { len += d.length; });
+          res.on('end', () => {
+            expect(res.headers['content-type']).to.be.equal('image/gif');
+            expect(len).to.be.equal(3194);
+            resolve();
+          });
+        });
+    });
+    /// const req2 = got('http://localhost:3000/flight.svg')
+    ///   .then((res) => {
+    ///     expect(res.statusCode).to.be.equal(200);
+    ///     expect(res.headers['content-type']).to.be.equal('image/svg+xml');
+    ///     expect(res.body.length).to.be.equal(1380);
+    ///   });
     const req3 = got('http://localhost:3000/article_123_comment_456.json')
       .then((res) => {
         expect(res.statusCode).to.be.equal(200);

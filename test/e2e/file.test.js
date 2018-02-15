@@ -17,7 +17,7 @@ describe('file system', function () {
 
   let server;
   beforeEach('create server', function () {
-    server = new Server({debug:1});
+    server = new Server();
   });
   afterEach('stop server', function () {
     server.stop();
@@ -74,15 +74,19 @@ describe('file system', function () {
     const res = await got('http://localhost:3000/dir/home.htm');
     ensureHome(res);
   });
-  it('existing binary file', async function () {
+  it.only('existing binary file', function (done) {
     server.start();
 
-    const res = await got('http://localhost:3000/flight.svg');
-    res.on('close', () => {
-      expect(res.statusCode).to.be.equal(200);
-      expect(res.headers['content-type']).to.be.equal('image/svg+xml');
-      expect(res.body.length).to.be.equal(1380);
-    });
+    let len = 0;
+    got.stream('http://localhost:3000/loading.gif')
+      .on('response', (res) => {
+        res.on('data', (d) => { len += d.length; });
+        res.on('end', () => {
+          expect(res.headers['content-type']).to.be.equal('image/gif');
+          expect(len).to.be.equal(3194);
+          done();
+        });
+      });
   });
   it('non-existing file', async function () {
     server.start();
