@@ -1,7 +1,7 @@
 {
   "name": "flex-mock-server",
-  "version": "2.0.4",
-  "description": "A flexible mock server with easy configuring of response from file, inline data, function and more.",
+  "version": "2.0.5",
+  "description": "A static server, with easy extendability to become mock server, via flexible configuring of response from file, inline data, function and more.",
   "bin": {
     "flex-mock-server": "bin/flex-mock-server.js",
     "fms": "bin/flex-mock-server.js"

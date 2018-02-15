@@ -82,6 +82,21 @@ describe('class FileReader', function () {
       doRead.resetHistory();
     });
 
+    it.only('query is removed', function () {
+      const stat = this.sandbox.spy();
+      const statP = bPromise.promisify(stat);
+      const access = this.sandbox.stub().callsFake((filePath, mode, cb) => cb());
+      const accessP = bPromise.promisify(access);
+      __RewireAPI__.__set__({
+        stat: statP,
+        access: accessP,
+      });
+
+      req.url = 'abc/def?afdsafs=323&dafd=1';
+      this.reader.handleFile(context);
+
+      sinon.assert.calledWith(stat, 'abc/def');
+    });
     it('folder is prepended', function () {
       const stat = this.sandbox.stub()
         .callsFake((filePath, cb) => cb(null, { isDirectory: () => {} }));
