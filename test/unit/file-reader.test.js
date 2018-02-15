@@ -82,7 +82,7 @@ describe('class FileReader', function () {
       doRead.resetHistory();
     });
 
-    it.only('query is removed', function () {
+    it('query is removed', function () {
       const stat = this.sandbox.spy();
       const statP = bPromise.promisify(stat);
       const access = this.sandbox.stub().callsFake((filePath, mode, cb) => cb());
