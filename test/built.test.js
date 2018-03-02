@@ -1,4 +1,6 @@
 /* eslint-disable */
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 const childProcess = require('child_process');
 const execFile = childProcess.execFile;
 const spawn = childProcess.spawn;
@@ -63,6 +65,17 @@ describe('cli', function () {
 
 describe('api', function () {
   this.timeout(5000);
+  it('https', async function () {
+    const server = new Server({ https: true });
+    server.start();
+
+    try {
+      await got('https://localhost:3000/data/number');
+    } catch (err) {
+      expect(err.response.statusCode).to.be.equal(404);
+      server.stop();
+    };
+  });
   it('{ data: 1 }', function (done) {
     const server = new Server({ map });
     server.start();
@@ -109,12 +122,6 @@ describe('api', function () {
           });
         });
     });
-    /// const req2 = got('http://localhost:3000/flight.svg')
-    ///   .then((res) => {
-    ///     expect(res.statusCode).to.be.equal(200);
-    ///     expect(res.headers['content-type']).to.be.equal('image/svg+xml');
-    ///     expect(res.body.length).to.be.equal(1380);
-    ///   });
     const req3 = got('http://localhost:3000/article_123_comment_456.json')
       .then((res) => {
         expect(res.statusCode).to.be.equal(200);

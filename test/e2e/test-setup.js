@@ -12,3 +12,4 @@ beforeEach('set sinon sandbox', function () {
 afterEach('restore sinon sandbox', function () {
   this.sandbox.restore();
 });
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';

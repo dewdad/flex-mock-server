@@ -6,11 +6,15 @@ import https from 'https';
 describe('cli', function () {
   this.timeout(5000);
   it('correct help message', function () {
-    const msg = execFileSync('node', ['node_modules/babel-cli/bin/babel-node.js', 'src/bin/flex-mock-server.js', '--help']);
+    const msg = execFileSync('node', [
+      'node_modules/babel-cli/bin/babel-node.js',
+      'src/bin/flex-mock-server.js',
+      '--help',
+    ]);
     expect(msg.indexOf('module.exports = {') > -1).to.be.ok;
   });
 
-  function test(get, done) {
+  function test(proto, get, done, flag) {
     let createChild = spawn;
     const opts = {};
     if (process.platform === 'win32') {
@@ -18,10 +22,14 @@ describe('cli', function () {
     } else {
       opts.detached = true;
     }
-    const child = createChild('node', ['node_modules/babel-cli/bin/babel-node.js', 'src/bin/flex-mock-server.js'], opts);
+    const child = createChild(
+      'node',
+      ['node_modules/babel-cli/bin/babel-node.js', 'src/bin/flex-mock-server.js', flag],
+      opts,
+    );
     child.stdout.on('data', (data) => {
       if (data.indexOf('Server listening on port') > -1) {
-        get('http://localhost:3000/abcdef', (res) => {
+        get(`${proto}://localhost:3000/abcdef`, (res) => {
           expect(res.statusCode).to.be.equal(404);
           if (process.platform === 'win32') {
             console.log('killing');
@@ -39,7 +47,7 @@ describe('cli', function () {
       if (code) {
         done(new Error('Server error'));
       } else {
-        const req = get('http://localhost:3000/abcdef', (res) => {
+        const req = get(`${proto}://localhost:3000/abcdef`, (res) => {
           console.log('failed to shutdown', res.statusCode);
         });
         req.on('data', function (data) {
@@ -56,9 +64,9 @@ describe('cli', function () {
   }
 
   it('http server runs successfully', function (done) {
-    test(http.get, done);
+    test('http', http.get, done);
   });
   it('https server runs successfully', function (done) {
-    test(https.get, done);
+    test('https', https.get, done, '-H');
   });
 });
