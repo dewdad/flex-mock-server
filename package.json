@@ -1,6 +1,6 @@
 {
   "name": "flex-mock-server",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "A static server, with easy extendability to become mock server, via flexible configuring of response from file, inline data, function and more.",
   "bin": {
     "flex-mock-server": "bin/flex-mock-server.js",
@@ -18,7 +18,7 @@
     "e2e": "cross-env BABEL_ENV=test mocha --require babel-core/register test/e2e",
     "test-built": "cross-env BABEL_ENV=test mocha test/built.test.js",
     "lint": "eslint ./src",
-    "build": "babel src -d ./ -s && npm run test-built && cpx src/cert cert",
+    "build": "babel src -d ./ -s && npm run test-built && copy src/cert cert",
     "prebuild": "npm run lint && npm test",
     "prepublishOnly": "npm run build"
   },
@@ -55,7 +55,7 @@
     "babel-preset-stage-1": "^6.24.1",
     "babel-register": "^6.24.1",
     "chai": "^4.1.2",
-    "cpx": "^1.5.0",
+    "copy-dir-cli": "0.0.3",
     "cross-env": "^5.1.1",
     "eslint": "^4.13.1",
     "eslint-config-airbnb-base": "^12.1.0",
