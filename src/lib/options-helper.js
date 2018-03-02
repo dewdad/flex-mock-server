@@ -92,8 +92,8 @@ export function parseCli(options) {
     .option('-k, --cors-cookie', 'allow cors credential')
     .option('-o, --auto-preflight', 'handle "OPTIONS" method automatically, bypassing checking map configs. default is true.', true)
     .option('-r, --root [dir]', 'virtual root directory where this app is mounted in the domain, alike webpack "publicPath", which will be removed when match file;')
+    .option('-H, --https', 'Whether to apply https.')
     .on('--help', () => {
-      const file = fs.readFileSync(path.resolve(__dirname, 'sample.map.js'));
       console.log(`
   Response map file:
     A list of path patterns (RegExp) mapping to responses. "root" directory should be omited.
@@ -127,10 +127,10 @@ export function parseCli(options) {
     - {function}: shorthand for function version of \`data\`: { data: func }
 
     This map is walked through twice. The first time matched "before" handlers are executed. The second time to retrieve response data. However if the first time encounters a standard code handler, e.g. type of config is  Number/Array, traversing stops, returns immediately.
+    A sample map file exists with path of 'lib/sample.map.js'.
 
-  [Map file example]
-
-${file}
+    'babel-polyfill' v6.26.0 is applied, New es6/7 features could be used in this map file.
+[Map file example]
     `);
     })
     .parse(process.argv);

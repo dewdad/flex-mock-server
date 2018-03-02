@@ -205,16 +205,17 @@ describe('parseCli', function () {
     cors: true,
     corsCookie: true,
     autoPreflight: true,
+    https: true,
     root,
   };
 
   it('long', function () {
-    process.argv = `node server --debug --port ${port} --cwd ${cwd} --folder ${folder} --map ${map} --index ${index} --history ${history} --cors --cors-cookie --auto-preflight false --root ${root}`.split(' ');
+    process.argv = `node server --debug --port ${port} --cwd ${cwd} --folder ${folder} --map ${map} --index ${index} --history ${history} --cors --cors-cookie --auto-preflight false --root ${root} --https`.split(' ');
     compare(parseCli(new Command()), options);
   });
 
   it('short', function () {
-    process.argv = `node server -d -p ${port} -c ${cwd} -f ${folder} -m ${map} -i ${index} -h ${history} -C -k -o false -r ${root}`.split(' ');
+    process.argv = `node server -d -p ${port} -c ${cwd} -f ${folder} -m ${map} -i ${index} -h ${history} -C -k -o false -r ${root} -H`.split(' ');
     compare(parseCli(new Command()), options);
   });
 });
