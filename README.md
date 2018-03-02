@@ -13,6 +13,7 @@ A static server, with easy extendability to become mock server, via flexible con
   * url to file path mapping
   * simple configuring for any http status code
   * full ability to manipulate request and response
+  * support https
 
 ## cli
 
@@ -35,7 +36,8 @@ A static server, with easy extendability to become mock server, via flexible con
   * -k, --cors-cookie:         Allow cors credential. When set, `cors` is implied to be true.
   * -o, --auto-preflight:      Handle "OPTIONS" method automatically, bypassing checking map configs.  default is true.
   * -r, --root [dir]:          Virtual root directory where this app is mounted in the domain, alike webpack "publicPath", which will be removed when match file.
-  * -h, --help:               Output usage information.
+  * -H, --https:               Whether to apply https.
+  * -h, --help:                Output usage information.
 
 ## api
 

@@ -1,23 +1,24 @@
 {
   "name": "flex-mock-server",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "A static server, with easy extendability to become mock server, via flexible configuring of response from file, inline data, function and more.",
   "bin": {
     "flex-mock-server": "bin/flex-mock-server.js",
     "fms": "bin/flex-mock-server.js"
   },
   "files": [
+    "/cert",
     "/lib",
     "/bin"
   ],
   "main": "lib/server",
   "scripts": {
     "test": "npm run unit && npm run e2e",
-    "unit": "cross-env BABEL_ENV=test nyc --reporter=lcov --reporter=text mocha --require babel-polyfill test/unit",
+    "unit": "cross-env BABEL_ENV=test nyc --reporter=lcov --reporter=text mocha --require babel-polyfill test/unit/",
     "e2e": "cross-env BABEL_ENV=test mocha --require babel-core/register test/e2e",
     "test-built": "cross-env BABEL_ENV=test mocha test/built.test.js",
     "lint": "eslint ./src",
-    "build": "babel src -d ./ -s && npm run test-built",
+    "build": "babel src -d ./ -s && npm run test-built && cpx src/cert cert",
     "prebuild": "npm run lint && npm test",
     "prepublishOnly": "npm run build"
   },
@@ -30,7 +31,10 @@
   },
   "homepage": "https://github.com/roneyrao/flex-mock-server#readme",
   "keywords": [
-    "mock"
+    "http",
+    "https",
+    "mock-server",
+    "static-server"
   ],
   "author": "Roney",
   "license": "MIT",
@@ -51,6 +55,7 @@
     "babel-preset-stage-1": "^6.24.1",
     "babel-register": "^6.24.1",
     "chai": "^4.1.2",
+    "cpx": "^1.5.0",
     "cross-env": "^5.1.1",
     "eslint": "^4.13.1",
     "eslint-config-airbnb-base": "^12.1.0",

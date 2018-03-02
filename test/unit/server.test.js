@@ -12,6 +12,7 @@ describe('class Server', function () {
     this.httpServer = { listen: this.listen, close: this.close, on: this.on };
     this.createServer = sinon.stub().returns(this.httpServer);
     mockRequire('http', { createServer: this.createServer });
+    mockRequire('https', { createServer: this.createServer });
 
     this.createLogger = sinon.stub().returns(this.logger);
     mockRequire('../../src/lib/debug', this.createLogger);
@@ -40,7 +41,7 @@ describe('class Server', function () {
     expect(this.server.logger).to.be.equal(this.logger);
     expect(this.server.options).to.be.equal(this.options);
   });
-  it('start', function () {
+  it('start http', function () {
     this.server.start();
 
     sinon.assert.calledWithExactly(this.createServer, this.listener);
@@ -55,6 +56,14 @@ describe('class Server', function () {
 
     sinon.assert.calledWithExactly(extErrorHandler, error);
     sinon.assert.calledOnce(this.server.stop);
+  });
+  it('start https', function () {
+    this.server.options.https = true;
+    this.server.start();
+
+    sinon.assert.calledTwice(this.createServer);
+    expect(this.createServer.getCall(1).args[0].key).to.be.ok;
+    expect(this.createServer.getCall(1).args[1]).equal(this.listener);
   });
   it('stop', function () {
     this.server.server.listening = true;

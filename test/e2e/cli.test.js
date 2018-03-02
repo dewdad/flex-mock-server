@@ -1,6 +1,7 @@
 import { execFileSync, execFile, spawn } from 'child_process';
 import { expect } from 'chai';
-import { get } from 'http';
+import http from 'http';
+import https from 'https';
 
 describe('cli', function () {
   this.timeout(5000);
@@ -9,7 +10,7 @@ describe('cli', function () {
     expect(msg.indexOf('module.exports = {') > -1).to.be.ok;
   });
 
-  it('server runs successfully', function (done) {
+  function test(get, done) {
     let createChild = spawn;
     const opts = {};
     if (process.platform === 'win32') {
@@ -52,5 +53,12 @@ describe('cli', function () {
         });
       }
     });
+  }
+
+  it('http server runs successfully', function (done) {
+    test(http.get, done);
+  });
+  it('https server runs successfully', function (done) {
+    test(https.get, done);
   });
 });

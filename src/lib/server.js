@@ -2,7 +2,10 @@ if (!global._babelPolyfill) {
   require('babel-polyfill');
 }
 
+import fs from 'fs';
+import path from 'path';
 import http from 'http';
+import https from 'https';
 import createLogger from './debug';
 import createListener from './listener';
 import { normalize } from './options-helper';
@@ -19,7 +22,15 @@ export default class Server {
     this.errorHandler = hdlr;
   }
   start() {
-    this.server = http.createServer(this.listener);
+    if (this.options.https) {
+      const config = {
+        key: fs.readFileSync(path.resolve(__dirname, '../cert/key.pem')),
+        cert: fs.readFileSync(path.resolve(__dirname, '../cert/cert.pem')),
+      };
+      this.server = https.createServer(config, this.listener);
+    } else {
+      this.server = http.createServer(this.listener);
+    }
     this.server.on('error', (err) => {
       if (this.errorHandler) {
         this.errorHandler(err);
