@@ -97,9 +97,12 @@ A static server, with easy extendability to become mock server, via flexible con
   ```
 
 ### `pattern`
-  A string to construct RexExp for url testing and replacing with file path.
+  A string to construct RexExp for url  testing and replacing with file path.
 
-  > Backslash should be escaped if you hope it take effects in constructed RegExp: `file\\.html`
+  > [Notes]
+  > * The `url` being matched against is whatever left after removing domain and `root` directory (if supplied).
+  > e.g. `/dir1/dir2/abc.ext` in `https://domain.com:123/dir1/dir2/abc.ext`
+  > * Backslash should be escaped if you hope it take effects in constructed RegExp: `file\\.html`
 
 ### `response`
   Allowed types are:
@@ -223,11 +226,11 @@ module.exports = {
     },
   },
 
-  // direct file path map
+  // direct file path mapping
   '/path/article/(\\d+)/comment/(\\d+)': {
     path: 'article_$2_comment_$1.json',
   },
-  // custom file path map
+  // custom file path mapping
   '/path/custom/article/(\\d+)/comment/(\\d+)': {
     path(req, res, logger) {
       return req.url.replace(

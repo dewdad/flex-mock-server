@@ -132,7 +132,11 @@ export default class MapProcessor {
       map.find(([patnReg, setting]) => {
         if (patnReg.test(req.url)) {
           this.logger.debug('matched pattern:', patnReg.source);
-          return !this.processMapResponse(patnReg, setting, wrapper, context);
+          const passThrough = this.processMapResponse(patnReg, setting, wrapper, context);
+          if (!passThrough) {
+            this.logger.log('processing mapping stopped');
+            return true;
+          }
         }
         return false;
       });

@@ -46,7 +46,8 @@ class Listener {
 
   send(data, context) {
     const { req, res } = context;
-    this.logger.debug('sent data for', req.url, res.getHeader('Content-type'));
+    this.logger.debug('sent data for', req.url);
+    this.logger.debug('headers:\n', req.headers);
     let body = data;
     if (res.afterHandlers.length) {
       res.afterHandlers.forEach((handler) => {
@@ -106,10 +107,10 @@ class Listener {
       resolve(this.mapProcessor.handleMap(context));
     }).then((wrapper) => {
       if (!('data' in wrapper)) {
-        this.logger.debug('no custom handlers handled');
+        this.logger.debug('no data gotten from map handlers');
         return this.fileReader.handleFile(context);
       }
-      this.logger.debug('get data from custom handlers', wrapper.data);
+      this.logger.debug('data gotten from custom handlers', wrapper.data);
       return wrapper.data;
     }).then(data => this.send(data, context))
       .catch((err) => {
