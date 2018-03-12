@@ -134,7 +134,7 @@ export default class MapProcessor {
           this.logger.debug('matched pattern:', patnReg.source);
           const passThrough = this.processMapResponse(patnReg, setting, wrapper, context);
           if (!passThrough) {
-            this.logger.log('processing mapping stopped');
+            this.logger.debug('processing mapping stopped');
             return true;
           }
         }
