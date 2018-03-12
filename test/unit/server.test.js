@@ -24,7 +24,6 @@ describe('class Server', function () {
     this.normalize = sinon.spy();
     mockRequire('../../src/lib/options-helper', { normalize: this.normalize });
 
-
     this.port = 123;
     this.debug = true;
     this.options = { port: this.port, debug: this.debug };
@@ -36,10 +35,14 @@ describe('class Server', function () {
   });
 
   it('constructor', function () {
-    sinon.assert.calledWithExactly(this.normalize, this.options, this.logger);
+    sinon.assert.calledWithExactly(
+      this.normalize,
+      sinon.match.same(this.server.options),
+      this.logger,
+    );
     sinon.assert.calledWithExactly(this.createLogger, this.debug);
     expect(this.server.logger).to.be.equal(this.logger);
-    expect(this.server.options).to.be.equal(this.options);
+    expect(this.server.options).not.equal(this.options);
   });
   it('start http', function () {
     this.server.start();

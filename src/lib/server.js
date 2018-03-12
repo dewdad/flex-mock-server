@@ -14,8 +14,8 @@ export default class Server {
   constructor(options) {
     options = options || {};
     this.logger = createLogger(options.debug);
-    normalize(options, this.logger);
-    this.options = options;
+    this.options = Object.assign({}, options);
+    normalize(this.options, this.logger);
     this.listener = createListener(this.options, this.logger);
   }
   onError(hdlr) {
