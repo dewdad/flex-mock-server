@@ -26,7 +26,7 @@ export function parseUrl(requestUrl, root, logger = getGlobalLogger()) {
   if (pathname.endsWith('/')) {
     pathname = pathname.substr(0, pathname.length - 1);
   }
-  pathname += parsedUrl.search;
+  pathname += parsedUrl.search || ''; // 'null' in windows
   logger.debug('parsed url', pathname);
   return pathname;
 }
